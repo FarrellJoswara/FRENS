@@ -1,10 +1,34 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import LoginPage from "./pages/LoginPage";
 import FrontPage from "./pages/FrontPage";
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+// ProtectedRoute wrapper
+function ProtectedRoute({ children }) {
+  const token = sessionStorage.getItem("google_token");
+
+  if (!token) {
+    return <Navigate to="/" replace />; // redirect to login if not logged in
+  }
+
+  // decode token to get user info
+  let user = {};
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    user = {
+      name: payload.name,
+      email: payload.email,
+    };
+  } catch (e) {
+    console.error("Failed to decode token:", e);
+  }
+
+  // clone children and pass user as prop
+  return React.cloneElement(children, { user });
+}
 
 function App() {
   if (!clientId) {
@@ -16,7 +40,14 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<LoginPage />} />
-          <Route path="/front" element={<FrontPage />} />
+          <Route
+            path="/front"
+            element={
+              <ProtectedRoute>
+                <FrontPage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Router>
     </GoogleOAuthProvider>

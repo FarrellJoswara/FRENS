@@ -6,10 +6,20 @@ function LoginPage() {
   const navigate = useNavigate();
 
   const handleSuccess = (credentialResponse) => {
-    // credentialResponse contains a JWT in credentialResponse.credential
-    // Save it to sessionStorage and redirect to the front page.
-    if (credentialResponse && credentialResponse.credential) {
+    if (credentialResponse?.credential) {
       sessionStorage.setItem("google_token", credentialResponse.credential);
+
+      // decode the JWT to get user info
+      try {
+        const payload = JSON.parse(
+          atob(credentialResponse.credential.split(".")[1])
+        );
+        console.log("User email:", payload.email);
+        console.log("User name:", payload.name);
+      } catch (e) {
+        console.error("Could not decode token:", e);
+      }
+
       navigate("/front");
     } else {
       console.warn("Google login succeeded but no credential present", credentialResponse);
