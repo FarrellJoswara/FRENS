@@ -14,27 +14,30 @@ function Social() {
     }}>
       hello chat  
       <Redirect_Button
-        svg={Button1}         // SVG for the button
-        top="10%"             // percent from top of container
-        left="50%"            // percent from left of container
-        size={80}             // size in pixels
-        rotation={0}          // rotation in degrees
+        img={Button1}
+        top="50%"
+        left="10%"
+        rotation={0}
+        scale={100}
+        hoverScale={1.08}
         route="/social/map"   // where it navigates on click
       />
       <Redirect_Button
-        svg={Button1}         // SVG for the button
-        top="10%"             // percent from top of container
-        left="20%"            // percent from left of container
-        size={80}             // size in pixels
-        rotation={0}          // rotation in degrees
+        img={Button1}
+        top="50%"
+        left="20%"
+        rotation={0}
+        scale={100}
+        hoverScale={1.08}          // rotation in degrees
         route="/social/split"   // where it navigates on click
       />
       <Redirect_Button
-        svg={Button1}         // SVG for the button
-        top="10%"             // percent from top of container
-        left="80%"            // percent from left of container
-        size={80}             // size in pixels
-        rotation={0}          // rotation in degrees
+        img={Button1}
+        top="50%"
+        left="30%"
+        rotation={0}
+        scale={100}
+        hoverScale={1.08}        // rotation in degrees
         route="/social/list"   // where it navigates on click
       />
     </div>
