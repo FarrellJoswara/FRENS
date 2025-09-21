@@ -1,101 +1,115 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-const ctx = createContext(null);
-const keyFor = (email) => `lyfe::${email || "anon"}`;
+/** Local persistence */
+const LS_KEY = "lyfe-db-v1";
 
-const emptyBundle = (name = "My First Lyfe") => {
-  const id = crypto.randomUUID?.() || String(Date.now());
-  const now = new Date().toISOString();
-  return {
-    byId: {
-      [id]: {
-        id, name, createdAt: now, updatedAt: now,
-        finance: { inputs: {}, computed: {} },
-        health:  { inputs: {}, computed: {} },
-      },
-    },
-    order: [id],
-    currentId: id,
-  };
-};
+/**
+ * Shape:
+ * {
+ *   list: [{ id, name, meta:{ job, location, salaryBand }, finance:{inputs,computed}, health:{inputs,computed} }],
+ *   currentId: string|null
+ * }
+ */
 
-const load = (email) => {
+function load() {
   try {
-    const raw = localStorage.getItem(keyFor(email));
-    return raw ? JSON.parse(raw) : emptyBundle();
-  } catch { return emptyBundle(); }
-};
-const persist = (email, data) => localStorage.setItem(keyFor(email), JSON.stringify(data));
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return { list: [], currentId: null }; // ⬅️ no default lyfe
+    const parsed = JSON.parse(raw);
+    if (!parsed.list) return { list: [], currentId: null };
+    return parsed;
+  } catch {
+    return { list: [], currentId: null };
+  }
+}
+function save(state) {
+  localStorage.setItem(LS_KEY, JSON.stringify(state));
+}
+
+const LyfeCtx = createContext(null);
 
 export function LyfeProvider({ userEmail, children }) {
-  const [data, setData] = useState(() => load(userEmail));
-  useEffect(() => persist(userEmail, data), [userEmail, data]);
-  const value = useMemo(() => ({ data, setData, userEmail }), [data, userEmail]);
-  return <ctx.Provider value={value}>{children}</ctx.Provider>;
+  const [list, setList] = useState(() => load().list);
+  const [currentId, setCurrentId] = useState(() => load().currentId ?? null);
+
+  useEffect(() => {
+    save({ list, currentId });
+  }, [list, currentId]);
+
+  // basic helpers
+  const getById = (id) => list.find((l) => l.id === id) || null;
+
+  const createLyfe = ({ name, job, location, salaryBand }) => {
+    const id = Math.random().toString(36).slice(2, 9);
+    const entry = {
+      id,
+      name: name?.trim() || "My Lyfe",
+      meta: { job: job || "", location: location || "", salaryBand: salaryBand || "" },
+      finance: { inputs: {}, computed: {} },
+      health: { inputs: {}, computed: {} },
+    };
+    setList((arr) => [...arr, entry]);
+    setCurrentId(id);
+    return id;
+  };
+
+  const updateLyfeMeta = (id, partial) => {
+    setList((arr) =>
+      arr.map((l) => (l.id === id ? { ...l, meta: { ...(l.meta || {}), ...partial } } : l))
+    );
+  };
+
+  const removeLyfe = (id) => {
+    setList((arr) => arr.filter((l) => l.id !== id));
+    setCurrentId((cid) => (cid === id ? null : cid));
+  };
+
+  // slice writer/reader (finance/health/etc)
+  const setSliceById = (id, sliceName, updaterOrObject) => {
+    setList((arr) =>
+      arr.map((l) => {
+        if (l.id !== id) return l;
+        const prev = l[sliceName] || {};
+        const next =
+          typeof updaterOrObject === "function"
+            ? updaterOrObject(prev)
+            : { ...prev, ...updaterOrObject };
+        return { ...l, [sliceName]: next };
+      })
+    );
+  };
+
+  const value = useMemo(
+    () => ({
+      list,
+      currentId,
+      setCurrentId,
+      getById,
+      createLyfe,
+      updateLyfeMeta,
+      removeLyfe,
+      setSliceById,
+    }),
+    [list, currentId]
+  );
+
+  return <LyfeCtx.Provider value={value}>{children}</LyfeCtx.Provider>;
 }
 
 export function useLyfe() {
-  const c = useContext(ctx);
-  if (!c) throw new Error("LyfeProvider missing");
-  const { data, setData } = c;
-
-  const list = data.order.map((id) => data.byId[id]);
-  const select = (id) => setData((d) => ({ ...d, currentId: id }));
-  const create = (name = "New Lyfe") =>
-    setData((d) => {
-      const id = crypto.randomUUID?.() || String(Date.now());
-      const now = new Date().toISOString();
-      return {
-        ...d,
-        byId: { ...d.byId, [id]: { id, name, createdAt: now, updatedAt: now, finance:{inputs:{},computed:{}}, health:{inputs:{},computed:{}} } },
-        order: [id, ...d.order],
-        currentId: id,
-      };
-    });
-  const rename = (id, name) =>
-    setData((d) => ({ ...d, byId: { ...d.byId, [id]: { ...d.byId[id], name, updatedAt: new Date().toISOString() } } }));
-  const remove = (id) =>
-    setData((d) => {
-      const byId = { ...d.byId }; delete byId[id];
-      const order = d.order.filter((x) => x !== id);
-      return { ...d, byId, order, currentId: d.currentId === id ? order[0] : d.currentId };
-    });
-  const duplicate = (id) =>
-    setData((d) => {
-      const src = d.byId[id]; if (!src) return d;
-      const newId = crypto.randomUUID?.() || String(Date.now());
-      const now = new Date().toISOString();
-      return {
-        ...d,
-        byId: { ...d.byId, [newId]: { ...src, id: newId, name: `${src.name} (copy)`, createdAt: now, updatedAt: now } },
-        order: [newId, ...d.order],
-        currentId: newId,
-      };
-    });
-
-  return { list, currentId: data.currentId, byId: data.byId, select, create, rename, remove, duplicate, setData };
+  const ctx = useContext(LyfeCtx);
+  if (!ctx) throw new Error("useLyfe must be used inside <LyfeProvider>");
+  return ctx;
 }
 
-/** Per-lyfe slice reader/writer (sliceName: 'finance' | 'health') */
+/** Convenience hook used by pages to bind to a slice of a lyfe */
 export function useLyfeSlice(sliceName, lyfeId) {
-  const { byId, currentId, setData } = useLyfe();
-  const id = lyfeId || currentId;
-  const lyfe = byId[id];
-  const slice = lyfe?.[sliceName] || { inputs: {}, computed: {} };
+  const { getById, setSliceById } = useLyfe();
+  const id = lyfeId; // required for persistence per-lyfe
+  const lyfe = getById(id);
 
-  const setSlice = (patch) => {
-    setData((d) => {
-      const cur = d.byId[id] || {};
-      const prev = cur[sliceName] || {};
-      return {
-        ...d,
-        byId: {
-          ...d.byId,
-          [id]: { ...cur, [sliceName]: { ...prev, ...patch }, updatedAt: new Date().toISOString() },
-        },
-      };
-    });
-  };
+  const slice = lyfe?.[sliceName] || {};
+  const setSlice = (updaterOrObject) => setSliceById(id, sliceName, updaterOrObject);
 
-  return { lyfeId: id, lyfe, slice, setSlice };
+  return { slice, setSlice, lyfe };
 }

@@ -1,3 +1,4 @@
+// src/pages/Health.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import "./Health.css";
 import HealthBg from "../assets/Health.svg";
@@ -28,14 +29,24 @@ const round = (n, d = 0) => Math.round(n * 10 ** d) / 10 ** d;
 
 /* ---------- local tracker store (browser only) ---------- */
 const LS_KEY = "health-db";
-function lsGetDB() { try { return JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch { return {}; } }
-function lsSetDB(db) { localStorage.setItem(LS_KEY, JSON.stringify(db)); }
+function lsGetDB() {
+  try {
+    return JSON.parse(localStorage.getItem(LS_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+function lsSetDB(db) {
+  localStorage.setItem(LS_KEY, JSON.stringify(db));
+}
 function saveDay(dateStr, partial) {
   const db = lsGetDB();
   db[dateStr] = { ...(db[dateStr] || {}), ...partial };
   lsSetDB(db);
 }
-function loadDay(dateStr) { return lsGetDB()[dateStr] || null; }
+function loadDay(dateStr) {
+  return lsGetDB()[dateStr] || null;
+}
 function loadRange(fromStr, toStr) {
   const db = lsGetDB();
   const from = new Date(fromStr), to = new Date(toStr);
@@ -91,10 +102,22 @@ function Bars({ data, width = 560, barH = 14, gap = 12 }) {
         const y = i * (barH + gap);
         return (
           <g key={d.label} transform={`translate(0,${y})`}>
-            <text x="0" y={barH - 2} className="bar-label">{d.label}</text>
+            <text x="0" y={barH - 2} className="bar-label">
+              {d.label}
+            </text>
             <rect x="130" y="0" width={usable} height={barH} fill="#eef2f7" rx="8" />
-            <rect x="130" y="0" width={w} height={barH} fill={d.color || "#22c55e"} rx="8" className="bar-fill-anim" />
-            <text x={130 + w + 8} y={barH - 2} className="bar-value">{d.right ?? round(d.value)}</text>
+            <rect
+              x="130"
+              y="0"
+              width={w}
+              height={barH}
+              fill={d.color || "#22c55e"}
+              rx="8"
+              className="bar-fill-anim"
+            />
+            <text x={130 + w + 8} y={barH - 2} className="bar-value">
+              {d.right ?? round(d.value)}
+            </text>
           </g>
         );
       })}
@@ -103,11 +126,16 @@ function Bars({ data, width = 560, barH = 14, gap = 12 }) {
 }
 function Sparkline({ points, width = 560, height = 100, color = "#22c55e" }) {
   if (!points || points.length < 2) return <div style={{ height }} />;
-  const min = Math.min(...points), max = Math.max(...points);
+  const min = Math.min(...points),
+    max = Math.max(...points);
   const xs = width / (points.length - 1);
   const y = (v) => height - ((v - min) / (max - min || 1)) * height;
   const d = points.map((p, i) => `${i === 0 ? "M" : "L"} ${i * xs} ${y(p)}`).join(" ");
-  return <svg width={width} height={height} className="spark"><path d={d} fill="none" stroke={color} strokeWidth="2.5" /></svg>;
+  return (
+    <svg width={width} height={height} className="spark">
+      <path d={d} fill="none" stroke={color} strokeWidth="2.5" />
+    </svg>
+  );
 }
 
 /* ---------- small UI atoms ---------- */
@@ -135,23 +163,37 @@ function Stepper({ step }) {
 /* ---------- routine builder ---------- */
 function buildRoutine({ focus, daysSel, minutes }) {
   const chosenDays = DAY_NAMES.filter((_, i) => daysSel[i]);
-  if (!chosenDays.length) return { plan: [], weekly: { sessions: 0, minutesTotal: 0, minutesCardio: 0, minutesStrength: 0 } };
+  if (!chosenDays.length)
+    return {
+      plan: [],
+      weekly: { sessions: 0, minutesTotal: 0, minutesCardio: 0, minutesStrength: 0 },
+    };
 
   const blocks =
-    focus === "PPL" ? ["Push", "Pull", "Legs"] :
-      focus === "Upper/Lower" ? ["Upper", "Lower"] :
-        focus === "Cardio-first" ? ["Cardio", "Strength (short)"] :
-          ["Full-body"];
+    focus === "PPL"
+      ? ["Push", "Pull", "Legs"]
+      : focus === "Upper/Lower"
+      ? ["Upper", "Lower"]
+      : focus === "Cardio-first"
+      ? ["Cardio", "Strength (short)"]
+      : ["Full-body"];
 
   const menu = {
-    "Full-body": ["Squat/Leg Press", "Bench/DB Press", "Row/Lat Pull", "Hinge (RDL)", "Core/Carry", "10–15m easy cardio"],
-    "Push": ["Bench/DB Press", "Overhead Press", "Incline DB", "Triceps pushdown", "Lateral raises", "Core"],
-    "Pull": ["Row", "Lat Pull", "Rear delt fly", "Biceps curl", "Back extension", "Core"],
-    "Legs": ["Back/Front Squat", "RDL", "Lunge/Leg Press", "Leg curl", "Calf raise", "Core"],
-    "Upper": ["Bench/DB Press", "Row/Lat Pull", "Overhead Press", "Pulldown", "Curls/Triceps"],
-    "Lower": ["Back/Front Squat", "RDL", "Leg Press/Lunge", "Leg curl", "Calf raise", "Core"],
-    "Cardio": ["30–45m Zone 2 (easy pace)"],
-    "Strength (short)": ["Full-body circuit 25m (squat, push, pull, hinge)"]
+    "Full-body": [
+      "Squat/Leg Press",
+      "Bench/DB Press",
+      "Row/Lat Pull",
+      "Hinge (RDL)",
+      "Core/Carry",
+      "10–15m easy cardio",
+    ],
+    Push: ["Bench/DB Press", "Overhead Press", "Incline DB", "Triceps pushdown", "Lateral raises", "Core"],
+    Pull: ["Row", "Lat Pull", "Rear delt fly", "Biceps curl", "Back extension", "Core"],
+    Legs: ["Back/Front Squat", "RDL", "Lunge/Leg Press", "Leg curl", "Calf raise", "Core"],
+    Upper: ["Bench/DB Press", "Row/Lat Pull", "Overhead Press", "Pulldown", "Curls/Triceps"],
+    Lower: ["Back/Front Squat", "RDL", "Leg Press/Lunge", "Leg curl", "Calf raise", "Core"],
+    Cardio: ["30–45m Zone 2 (easy pace)"],
+    "Strength (short)": ["Full-body circuit 25m (squat, push, pull, hinge)"],
   };
 
   const plan = [];
@@ -166,8 +208,8 @@ function buildRoutine({ focus, daysSel, minutes }) {
   const weekly = {
     sessions: plan.length,
     minutesTotal: plan.reduce((a, s) => a + s.minutes, 0),
-    minutesCardio: plan.filter(s => s.block === "Cardio").reduce((a, s) => a + s.minutes, 0),
-    minutesStrength: plan.filter(s => s.block !== "Cardio").reduce((a, s) => a + s.minutes, 0),
+    minutesCardio: plan.filter((s) => s.block === "Cardio").reduce((a, s) => a + s.minutes, 0),
+    minutesStrength: plan.filter((s) => s.block !== "Cardio").reduce((a, s) => a + s.minutes, 0),
   };
 
   return { plan, weekly };
@@ -179,8 +221,12 @@ export default function Health() {
   const { lyfeId } = useParams();
   const { slice, setSlice } = useLyfeSlice("health", lyfeId);
   const saved = slice?.inputs || {};
+  const savedUI = slice?.ui || {};
 
-  const [step, setStep] = useState(1);
+  // wizard
+  const [step, setStep] = useState(
+    saved.step ?? (saved.goal && saved.age && saved.heightCm && saved.weightKg ? 3 : 1)
+  );
   const [goal, setGoal] = useState(saved.goal ?? ""); // Weight | Strength | Cardio | Wellness
   const [timeline, setTimeline] = useState(saved.timeline ?? "8 weeks");
 
@@ -192,7 +238,7 @@ export default function Health() {
   const [age, setAge] = useState(saved.age ?? "");
   const [sex, setSex] = useState(saved.sex ?? "F");
   const [heightCm, setHeightCm] = useState(saved.heightCm ?? ""); // internally cm
-  const [heightFt, setHeightFt] = useState(saved.heightFt ?? 5);  // shown if ft+in selected
+  const [heightFt, setHeightFt] = useState(saved.heightFt ?? 5); // shown if ft+in selected
   const [heightIn, setHeightIn] = useState(saved.heightIn ?? 5);
   const [weightKg, setWeightKg] = useState(saved.weightKg ?? ""); // internally kg
   const [activity, setActivity] = useState(saved.activity ?? "light");
@@ -203,9 +249,22 @@ export default function Health() {
   const [minutes, setMinutes] = useState(saved.minutes ?? 45);
   const [daysSel, setDaysSel] = useState(saved.daysSel ?? [true, false, true, false, true, false, false]);
 
+  // outlook controls for Weight
+  const [weightChangeLbs, setWeightChangeLbs] = useState(saved.weightChangeLbs ?? -8);
+  const [paceLbsPerWk, setPaceLbsPerWk] = useState(saved.paceLbsPerWk ?? -1);
+
+  // plan UI
+  const [planVisible, setPlanVisible] = useState(
+    savedUI.planVisible ?? (saved.goal && saved.age && saved.heightCm && saved.weightKg ? true : false)
+  );
+  const [planTab, setPlanTab] = useState(savedUI.planTab ?? "daily"); // daily | routine | outlook | playbook | tracker
+
   /** ---------- hydrate when :lyfeId changes ---------- */
   useEffect(() => {
     const sv = (slice && slice.inputs) || {};
+    const ui = slice?.ui || {};
+
+    setStep(sv.step ?? (sv.goal && sv.age && sv.heightCm && sv.weightKg ? 3 : 1));
     setGoal(sv.goal ?? "");
     setTimeline(sv.timeline ?? "8 weeks");
     setWeightUnit(sv.weightUnit ?? "kg");
@@ -223,16 +282,30 @@ export default function Health() {
     setFocus(sv.focus ?? "Full-body");
     setMinutes(sv.minutes ?? 45);
     setDaysSel(sv.daysSel ?? [true, false, true, false, true, false, false]);
+
+    setWeightChangeLbs(sv.weightChangeLbs ?? -8);
+    setPaceLbsPerWk(sv.paceLbsPerWk ?? -1);
+
+    setPlanVisible(ui.planVisible ?? (sv.goal && sv.age && sv.heightCm && sv.weightKg ? true : false));
+    setPlanTab(ui.planTab ?? "daily");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lyfeId]);
 
-  // when unit toggles change, convert the existing stored values
-  const toggleWeightUnit = (u) => { if (u !== weightUnit) setWeightUnit(u); };
+  // auto-advance to step 3 if we already have a saved plan
+  useEffect(() => {
+    if (planVisible && step < 3) setStep(3);
+  }, [planVisible, step]);
+
+  // unit toggles
+  const toggleWeightUnit = (u) => {
+    if (u !== weightUnit) setWeightUnit(u);
+  };
   const toggleHeightUnit = (u) => {
     if (u === heightUnit) return;
     if (u === "ftin" && heightCm) {
       const { ft, inch } = ftInFromCm(+heightCm);
-      setHeightFt(ft); setHeightIn(inch);
+      setHeightFt(ft);
+      setHeightIn(inch);
     }
     if (u === "cm" && (heightFt || heightIn)) {
       setHeightCm(cmFromFtIn(+heightFt || 0, +heightIn || 0));
@@ -241,18 +314,22 @@ export default function Health() {
   };
 
   // display proxies
-  const weightDisplay = weightUnit === "kg"
-    ? (weightKg ?? "")
-    : (weightKg !== "" ? round(kgToLb(+weightKg), 1) : "");
+  const weightDisplay = weightUnit === "kg" ? weightKg ?? "" : weightKg !== "" ? round(kgToLb(+weightKg), 1) : "";
   const setWeightDisplay = (val) => {
-    if (val === "" || isNaN(val)) { setWeightKg(""); return; }
+    if (val === "" || isNaN(val)) {
+      setWeightKg("");
+      return;
+    }
     const num = +val;
     setWeightKg(weightUnit === "kg" ? num : lbToKg(num));
   };
 
-  const heightDisplayCm = heightUnit === "cm" ? heightCm : (heightCm ? heightCm : "");
+  const heightDisplayCm = heightUnit === "cm" ? heightCm : heightCm ? heightCm : "";
   const setHeightDisplayCm = (v) => {
-    if (v === "" || isNaN(v)) { setHeightCm(""); return; }
+    if (v === "" || isNaN(v)) {
+      setHeightCm("");
+      return;
+    }
     setHeightCm(+v);
   };
 
@@ -268,7 +345,13 @@ export default function Health() {
   const weeks = TIMELINE_WEEKS[timeline] || 8;
 
   // energy
-  const bmr = useMemo(() => validInfo ? mifflinStJeor({ sex, weightKg: +weightKg, heightCm: +heightCm, age: +age }) : 0, [sex, weightKg, heightCm, age, validInfo]);
+  const bmr = useMemo(
+    () =>
+      validInfo
+        ? mifflinStJeor({ sex, weightKg: +weightKg, heightCm: +heightCm, age: +age })
+        : 0,
+    [sex, weightKg, heightCm, age, validInfo]
+  );
   const tdee = useMemo(() => (bmr ? bmr * (ACTIVITY[activity] || 1.375) : 0), [bmr, activity]);
 
   const calorieTarget = useMemo(() => {
@@ -302,13 +385,10 @@ export default function Health() {
     [focus, daysSel, minutes]
   );
 
-  // Outlook controls for Weight
-  const [weightChangeLbs, setWeightChangeLbs] = useState(-8);
-  const [paceLbsPerWk, setPaceLbsPerWk] = useState(-1);
-
-  // outlook series
+  // outlook series helpers
   const dailyGap = Math.round(calorieTarget - tdee);
   const kgPerWeek = round((dailyGap * 7) / 7700, 2);
+
   const weightSeries = useMemo(() => {
     if (goal !== "Weight" || !weightKg) return [];
     const startLb = kgToLb(+weightKg);
@@ -331,7 +411,8 @@ export default function Health() {
     const arr = [100];
     for (let i = 1; i <= steps; i++) arr.push(round(arr[i - 1] * rate, 1));
     const weekly = [];
-    for (let w = 0; w <= weeks; w++) weekly.push(round(100 + (arr[arr.length - 1] - 100) * (w / weeks), 1));
+    for (let w = 0; w <= weeks; w++)
+      weekly.push(round(100 + (arr[arr.length - 1] - 100) * (w / weeks), 1));
     return weekly;
   }, [goal, weeks, routineWeekly.sessions]);
 
@@ -341,18 +422,22 @@ export default function Health() {
     const good = minWeek >= 150;
     const totalGain = good ? 10 : 5; // %
     const arr = [];
-    for (let w = 0; w <= weeks; w++) arr.push(round(100 + (totalGain * w / weeks), 1));
+    for (let w = 0; w <= weeks; w++) arr.push(round(100 + (totalGain * w) / weeks, 1));
     return arr;
   }, [goal, weeks, routineWeekly.minutesCardio]);
 
-  const paceText = goal === "Weight"
-    ? `Pace needed: ${paceLbsPerWk} lb/week`
-    : `Minutes/week: ${routineWeekly.minutesTotal}`;
+  const paceText =
+    goal === "Weight"
+      ? `Pace needed: ${paceLbsPerWk} lb/week`
+      : `Minutes/week: ${routineWeekly.minutesTotal}`;
 
-  // plan UI
-  const [planVisible, setPlanVisible] = useState(false);
-  const [planTab, setPlanTab] = useState("daily"); // daily | routine | outlook | playbook | tracker
-  const calculatePlan = () => { if (validInfo) { setPlanVisible(true); setStep(3); } };
+  // plan actions
+  const calculatePlan = () => {
+    if (validInfo) {
+      setPlanVisible(true);
+      setStep(3);
+    }
+  };
 
   /* ---------- tracker state ---------- */
   const today = useMemo(() => new Date().toISOString().slice(0, 10), []);
@@ -360,7 +445,9 @@ export default function Health() {
   const [tWeightKg, setTWeightKg] = useState(() => loadDay(today)?.weightKg ?? (+weightKg || ""));
   const [tWaterMl, setTWaterMl] = useState(() => loadDay(today)?.waterMl ?? 0);
   const [tWorkoutDone, setTWorkoutDone] = useState(() => loadDay(today)?.workout ?? false);
-  const [tWorkoutEntries, setTWorkoutEntries] = useState(() => loadDay(today)?.workoutEntries || []);
+  const [tWorkoutEntries, setTWorkoutEntries] = useState(
+    () => loadDay(today)?.workoutEntries || []
+  );
   const [tMeals, setTMeals] = useState(() => loadDay(today)?.meals || []);
   const [tNotes, setTNotes] = useState(() => loadDay(today)?.notes || "");
 
@@ -382,38 +469,84 @@ export default function Health() {
       workout: !!tWorkoutDone,
       workoutEntries: tWorkoutEntries,
       meals: tMeals,
-      notes: tNotes
+      notes: tNotes,
     });
   }, [tDate, tWeightKg, tWaterMl, tWorkoutDone, tWorkoutEntries, tMeals, tNotes]);
 
   const hist = useMemo(() => {
     const end = new Date();
-    const start = new Date(end); start.setDate(start.getDate() - 29);
+    const start = new Date(end);
+    start.setDate(start.getDate() - 29);
     const fmt = (d) => d.toISOString().slice(0, 10);
     return loadRange(fmt(start), fmt(end));
   }, [tDate, tWorkoutDone, tWaterMl, tWeightKg, tWorkoutEntries, tMeals, tNotes]);
 
-  const weightSeries30 = hist.map(h => (h.weightKg ? kgToLb(h.weightKg) : null)).filter(v => v != null);
-  const waterSeries30 = hist.map(h => (h.waterMl ?? 0) / 1000);
-  const workoutCount7 = hist.slice(-7).filter(h => h.workout).length;
+  const weightSeries30 = hist
+    .map((h) => (h.weightKg ? kgToLb(h.weightKg) : null))
+    .filter((v) => v != null);
+  const waterSeries30 = hist.map((h) => (h.waterMl ?? 0) / 1000);
+  const workoutCount7 = hist.slice(-7).filter((h) => h.workout).length;
 
   /** ---------- persist to lyfe ---------- */
   useEffect(() => {
     setSlice({
       inputs: {
-        goal, timeline, weightUnit, heightUnit,
-        age, sex, heightCm, heightFt, heightIn, weightKg,
-        activity, diet, focus, minutes, daysSel,
+        step,
+        goal,
+        timeline,
+        weightUnit,
+        heightUnit,
+        age,
+        sex,
+        heightCm,
+        heightFt,
+        heightIn,
+        weightKg,
+        activity,
+        diet,
+        focus,
+        minutes,
+        daysSel,
+        weightChangeLbs,
+        paceLbsPerWk,
       },
       computed: {
-        calorieTarget, proteinG, waterL, routineDays: routinePlan.length,
+        calorieTarget,
+        proteinG,
+        waterL,
+        routineDays: routinePlan.length,
+      },
+      ui: {
+        planVisible,
+        planTab,
       },
     });
   }, [
-    goal, timeline, weightUnit, heightUnit,
-    age, sex, heightCm, heightFt, heightIn, weightKg,
-    activity, diet, focus, minutes, daysSel,
-    calorieTarget, proteinG, waterL, routinePlan.length,
+    step,
+    goal,
+    timeline,
+    weightUnit,
+    heightUnit,
+    age,
+    sex,
+    heightCm,
+    heightFt,
+    heightIn,
+    weightKg,
+    activity,
+    diet,
+    focus,
+    minutes,
+    daysSel,
+    weightChangeLbs,
+    paceLbsPerWk,
+    calorieTarget,
+    proteinG,
+    waterL,
+    routinePlan.length,
+    planVisible,
+    planTab,
+    setSlice,
   ]);
 
   /* ---------- render ---------- */
@@ -444,12 +577,20 @@ export default function Health() {
             ))}
           </div>
           <Field label="Over this timeline">
-            <select className="input" value={timeline} onChange={(e) => setTimeline(e.target.value)}>
-              {Object.keys(TIMELINE_WEEKS).map((k) => <option key={k}>{k}</option>)}
+            <select
+              className="input"
+              value={timeline}
+              onChange={(e) => setTimeline(e.target.value)}
+            >
+              {Object.keys(TIMELINE_WEEKS).map((k) => (
+                <option key={k}>{k}</option>
+              ))}
             </select>
           </Field>
           <div className="actions">
-            <button className="primary" disabled={!goal} onClick={() => setStep(2)}>Next</button>
+            <button className="primary" disabled={!goal} onClick={() => setStep(2)}>
+              Next
+            </button>
           </div>
         </section>
 
@@ -460,35 +601,96 @@ export default function Health() {
 
             {/* Unit toggles */}
             <div className="grid3">
-              <Field label="Weight unit" right={<span className="unit-badge">{weightUnit.toUpperCase()}</span>}>
+              <Field
+                label="Weight unit"
+                right={<span className="unit-badge">{weightUnit.toUpperCase()}</span>}
+              >
                 <div className="chips">
-                  <button className={`chip ${weightUnit==="kg"?"on":""}`} onClick={()=>toggleWeightUnit("kg")}>kg</button>
-                  <button className={`chip ${weightUnit==="lb"?"on":""}`} onClick={()=>toggleWeightUnit("lb")}>lb</button>
+                  <button
+                    className={`chip ${weightUnit === "kg" ? "on" : ""}`}
+                    onClick={() => toggleWeightUnit("kg")}
+                  >
+                    kg
+                  </button>
+                  <button
+                    className={`chip ${weightUnit === "lb" ? "on" : ""}`}
+                    onClick={() => toggleWeightUnit("lb")}
+                  >
+                    lb
+                  </button>
                 </div>
               </Field>
-              <Field label="Height unit" right={<span className="unit-badge">{heightUnit==="cm"?"CM":"FT+IN"}</span>}>
+              <Field
+                label="Height unit"
+                right={<span className="unit-badge">{heightUnit === "cm" ? "CM" : "FT+IN"}</span>}
+              >
                 <div className="chips">
-                  <button className={`chip ${heightUnit==="cm"?"on":""}`} onClick={()=>toggleHeightUnit("cm")}>cm</button>
-                  <button className={`chip ${heightUnit==="ftin"?"on":""}`} onClick={()=>toggleHeightUnit("ftin")}>ft+in</button>
+                  <button
+                    className={`chip ${heightUnit === "cm" ? "on" : ""}`}
+                    onClick={() => toggleHeightUnit("cm")}
+                  >
+                    cm
+                  </button>
+                  <button
+                    className={`chip ${heightUnit === "ftin" ? "on" : ""}`}
+                    onClick={() => toggleHeightUnit("ftin")}
+                  >
+                    ft+in
+                  </button>
                 </div>
               </Field>
             </div>
 
             <div className="grid4">
-              <Field label="Age"><input className="input" type="number" min={14} max={80} value={age} onChange={(e) => setAge(e.target.value)} /></Field>
-              <Field label="Sex"><select className="input" value={sex} onChange={(e) => setSex(e.target.value)}><option>F</option><option>M</option></select></Field>
+              <Field label="Age">
+                <input
+                  className="input"
+                  type="number"
+                  min={14}
+                  max={80}
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                />
+              </Field>
+              <Field label="Sex">
+                <select className="input" value={sex} onChange={(e) => setSex(e.target.value)}>
+                  <option>F</option>
+                  <option>M</option>
+                </select>
+              </Field>
 
               {/* Height inputs */}
               {heightUnit === "cm" ? (
                 <Field label="Height (cm)">
-                  <input className="input" type="number" min={140} max={210} value={heightDisplayCm} onChange={(e) => setHeightDisplayCm(e.target.value)} />
+                  <input
+                    className="input"
+                    type="number"
+                    min={140}
+                    max={210}
+                    value={heightDisplayCm}
+                    onChange={(e) => setHeightDisplayCm(e.target.value)}
+                  />
                 </Field>
               ) : (
                 <Field label="Height (ft + in)">
                   <div className="ftin">
-                    <input className="input" type="number" min={4} max={7} value={heightFt} onChange={(e)=>setHeightFt(+e.target.value)} />
+                    <input
+                      className="input"
+                      type="number"
+                      min={4}
+                      max={7}
+                      value={heightFt}
+                      onChange={(e) => setHeightFt(+e.target.value)}
+                    />
                     <span className="ftin-sep">ft</span>
-                    <input className="input" type="number" min={0} max={11} value={heightIn} onChange={(e)=>setHeightIn(+e.target.value)} />
+                    <input
+                      className="input"
+                      type="number"
+                      min={0}
+                      max={11}
+                      value={heightIn}
+                      onChange={(e) => setHeightIn(+e.target.value)}
+                    />
                     <span className="ftin-sep">in</span>
                   </div>
                 </Field>
@@ -496,14 +698,24 @@ export default function Health() {
 
               {/* Weight input */}
               <Field label={`Weight (${weightUnit})`}>
-                <input className="input" type="number" min={weightUnit==="kg"?40:88} max={weightUnit==="kg"?180:400}
-                       value={weightDisplay} onChange={(e)=>setWeightDisplay(e.target.value)} />
+                <input
+                  className="input"
+                  type="number"
+                  min={weightUnit === "kg" ? 40 : 88}
+                  max={weightUnit === "kg" ? 180 : 400}
+                  value={weightDisplay}
+                  onChange={(e) => setWeightDisplay(e.target.value)}
+                />
               </Field>
             </div>
 
             <div className="grid3">
               <Field label="Activity">
-                <select className="input" value={activity} onChange={(e) => setActivity(e.target.value)}>
+                <select
+                  className="input"
+                  value={activity}
+                  onChange={(e) => setActivity(e.target.value)}
+                >
                   <option value="sedentary">Sedentary</option>
                   <option value="light">Light</option>
                   <option value="moderate">Moderate</option>
@@ -512,16 +724,26 @@ export default function Health() {
               </Field>
               <Field label="Diet style">
                 <select className="input" value={diet} onChange={(e) => setDiet(e.target.value)}>
-                  <option>Omni</option><option>Vegetarian</option><option>Vegan</option><option>Mediterranean</option><option>High-protein</option>
+                  <option>Omni</option>
+                  <option>Vegetarian</option>
+                  <option>Vegan</option>
+                  <option>Mediterranean</option>
+                  <option>High-protein</option>
                 </select>
               </Field>
             </div>
 
-            <p className="hint">We’ll compute your daily targets from this. You can tweak them after calculation.</p>
+            <p className="hint">
+              We’ll compute your daily targets from this. You can tweak them after calculation.
+            </p>
 
             <div className="actions">
-              <button className="secondary" onClick={() => setStep(1)}>Back</button>
-              <button className="primary" disabled={!validInfo} onClick={calculatePlan}>Calculate plan</button>
+              <button className="secondary" onClick={() => setStep(1)}>
+                Back
+              </button>
+              <button className="primary" disabled={!validInfo} onClick={calculatePlan}>
+                Calculate plan
+              </button>
             </div>
           </section>
         )}
@@ -531,22 +753,59 @@ export default function Health() {
           <section className="plan-panel">
             <div className="plan-summary">
               <div className="pill">{goal}</div>
-              <div className="sum-item"><span>Timeline</span><b>{timeline}</b></div>
-              <div className="sum-item"><span>Calories</span><b>{calorieTarget} kcal</b></div>
-              <div className="sum-item"><span>Protein</span><b>{proteinG} g</b></div>
-              <div className="sum-item"><span>Water</span><b>{waterL} L</b></div>
-              <div className="sum-item"><span>Routine</span><b>{minutes}m · {routinePlan.length}d · {focus}</b></div>
-              <div className={`sum-item tag ${goal === "Weight" && (kgPerWeek < -1 || kgPerWeek > 1) ? "warn" : ""}`}>{paceText}</div>
+              <div className="sum-item">
+                <span>Timeline</span>
+                <b>{timeline}</b>
+              </div>
+              <div className="sum-item">
+                <span>Calories</span>
+                <b>{calorieTarget} kcal</b>
+              </div>
+              <div className="sum-item">
+                <span>Protein</span>
+                <b>{proteinG} g</b>
+              </div>
+              <div className="sum-item">
+                <span>Water</span>
+                <b>{waterL} L</b>
+              </div>
+              <div className="sum-item">
+                <span>Routine</span>
+                <b>
+                  {minutes}m · {routinePlan.length}d · {focus}
+                </b>
+              </div>
+              <div
+                className={`sum-item tag ${
+                  goal === "Weight" && (kgPerWeek < -1 || kgPerWeek > 1) ? "warn" : ""
+                }`}
+              >
+                {paceText}
+              </div>
               {goal === "Weight" && (sex === "F" ? calorieTarget < 1200 : calorieTarget < 1500) && (
                 <div className="sum-item tag warn">We clamped calories to a safer minimum.</div>
               )}
-              <button className="print-btn" onClick={() => window.print()}>Print / PDF</button>
+              <button className="print-btn" onClick={() => window.print()}>
+                Print / PDF
+              </button>
             </div>
 
             <div className="tabs">
-              {["daily", "routine", "outlook", "playbook", "tracker"].map(t => (
-                <button key={t} className={planTab === t ? "active" : ""} onClick={() => setPlanTab(t)}>
-                  {t === "daily" ? "Daily targets" : t === "routine" ? "Weekly routine" : t === "outlook" ? "Outlook" : t === "playbook" ? "Playbook" : "Tracker"}
+              {["daily", "routine", "outlook", "playbook", "tracker"].map((t) => (
+                <button
+                  key={t}
+                  className={planTab === t ? "active" : ""}
+                  onClick={() => setPlanTab(t)}
+                >
+                  {t === "daily"
+                    ? "Daily targets"
+                    : t === "routine"
+                    ? "Weekly routine"
+                    : t === "outlook"
+                    ? "Outlook"
+                    : t === "playbook"
+                    ? "Playbook"
+                    : "Tracker"}
                 </button>
               ))}
             </div>
@@ -556,29 +815,65 @@ export default function Health() {
               {planTab === "daily" && (
                 <div className="grid2">
                   <div>
-                    <div className="target"><div className="target-label">Calories / day</div><div className="target-value">{calorieTarget} kcal</div></div>
+                    <div className="target">
+                      <div className="target-label">Calories / day</div>
+                      <div className="target-value">{calorieTarget} kcal</div>
+                    </div>
                     <div className="macro-box">
-                      <div className="macro-row"><span>Protein</span><b>{proteinG} g</b><i>({proteinPct}%)</i></div>
-                      <div className="macro-row"><span>Carbs</span><b>{carbsG} g</b><i>({carbPct}%)</i></div>
-                      <div className="macro-row"><span>Fat</span><b>{fatG} g</b><i>({fatSharePct}%)</i></div>
-                      <div className="macro-row"><span>Water</span><b>{waterL} L/day</b></div>
+                      <div className="macro-row">
+                        <span>Protein</span>
+                        <b>{proteinG} g</b>
+                        <i>({proteinPct}%)</i>
+                      </div>
+                      <div className="macro-row">
+                        <span>Carbs</span>
+                        <b>{carbsG} g</b>
+                        <i>({carbPct}%)</i>
+                      </div>
+                      <div className="macro-row">
+                        <span>Fat</span>
+                        <b>{fatG} g</b>
+                        <i>({fatSharePct}%)</i>
+                      </div>
+                      <div className="macro-row">
+                        <span>Water</span>
+                        <b>{waterL} L/day</b>
+                      </div>
                     </div>
                     <div className="templates">
-                      {["3 meals + 2 snacks", "High-protein 3 meals", "16:8 IF", "Budget-friendly"].map(m => (
-                        <button key={m} className="template">{m}</button>
-                      ))}
+                      {["3 meals + 2 snacks", "High-protein 3 meals", "16:8 IF", "Budget-friendly"].map(
+                        (m) => (
+                          <button key={m} className="template">
+                            {m}
+                          </button>
+                        )
+                      )}
                     </div>
                   </div>
                   <div className="center">
-                    <Donut data={[
-                      { label: "Protein", value: proteinG * 4, color: "#22c55e" },
-                      { label: "Carbs", value: carbsG * 4, color: "#3b82f6" },
-                      { label: "Fat", value: fatCal, color: "#f59e0b" },
-                    ]} />
+                    <Donut
+                      data={[
+                        { label: "Protein", value: proteinG * 4, color: "#22c55e" },
+                        { label: "Carbs", value: carbsG * 4, color: "#3b82f6" },
+                        { label: "Fat", value: fatCal, color: "#f59e0b" },
+                      ]}
+                    />
                     <div className="legend">
-                      <div className="legend-row"><span className="swatch" style={{ background: "#22c55e" }} /><span>Protein</span><b>{proteinPct}%</b></div>
-                      <div className="legend-row"><span className="swatch" style={{ background: "#3b82f6" }} /><span>Carbs</span><b>{carbPct}%</b></div>
-                      <div className="legend-row"><span className="swatch" style={{ background: "#f59e0b" }} /><span>Fat</span><b>{fatSharePct}%</b></div>
+                      <div className="legend-row">
+                        <span className="swatch" style={{ background: "#22c55e" }} />
+                        <span>Protein</span>
+                        <b>{proteinPct}%</b>
+                      </div>
+                      <div className="legend-row">
+                        <span className="swatch" style={{ background: "#3b82f6" }} />
+                        <span>Carbs</span>
+                        <b>{carbPct}%</b>
+                      </div>
+                      <div className="legend-row">
+                        <span className="swatch" style={{ background: "#f59e0b" }} />
+                        <span>Fat</span>
+                        <b>{fatSharePct}%</b>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -589,19 +884,40 @@ export default function Health() {
                 <>
                   <div className="grid3">
                     <Field label="Focus">
-                      <select className="input" value={focus} onChange={(e) => setFocus(e.target.value)}>
-                        <option>Full-body</option><option>PPL</option><option>Upper/Lower</option><option>Cardio-first</option>
+                      <select
+                        className="input"
+                        value={focus}
+                        onChange={(e) => setFocus(e.target.value)}
+                      >
+                        <option>Full-body</option>
+                        <option>PPL</option>
+                        <option>Upper/Lower</option>
+                        <option>Cardio-first</option>
                       </select>
                     </Field>
                     <Field label="Session length">
-                      <select className="input" value={minutes} onChange={(e) => setMinutes(+e.target.value)}>
-                        <option value={30}>30 min</option><option value={45}>45 min</option><option value={60}>60 min</option>
+                      <select
+                        className="input"
+                        value={minutes}
+                        onChange={(e) => setMinutes(+e.target.value)}
+                      >
+                        <option value={30}>30 min</option>
+                        <option value={45}>45 min</option>
+                        <option value={60}>60 min</option>
                       </select>
                     </Field>
                     <Field label="Days">
                       <div className="chips">
                         {DAY_NAMES.map((d, i) => (
-                          <button key={d} className={`chip ${daysSel[i] ? "on" : ""}`} onClick={() => setDaysSel(s => s.map((v, idx) => idx === i ? !v : v))}>{d}</button>
+                          <button
+                            key={d}
+                            className={`chip ${daysSel[i] ? "on" : ""}`}
+                            onClick={() =>
+                              setDaysSel((s) => s.map((v, idx) => (idx === i ? !v : v)))
+                            }
+                          >
+                            {d}
+                          </button>
                         ))}
                       </div>
                     </Field>
@@ -610,34 +926,68 @@ export default function Health() {
                   <div className="panel soft">
                     {routinePlan.length === 0 ? (
                       <div className="routine-row">Pick 2–4 days to build your routine.</div>
-                    ) : routinePlan.map((s, i) => (
-                      <div key={i} className="routine-row">
-                        <b>{s.day} — {s.block} · {s.minutes}m</b>
-                        <div className="routine-ex">{s.exercises.join(" · ")}</div>
-                      </div>
-                    ))}
+                    ) : (
+                      routinePlan.map((s, i) => (
+                        <div key={i} className="routine-row">
+                          <b>
+                            {s.day} — {s.block} · {s.minutes}m
+                          </b>
+                          <div className="routine-ex">{s.exercises.join(" · ")}</div>
+                        </div>
+                      ))
+                    )}
                   </div>
 
-                  <div className="panel soft" style={{marginTop:10}}>
-                    <div className="legend-row"><span className="swatch" style={{background:"#22c55e"}}/> Strength volume</div>
-                    <div className="legend-row"><span className="swatch" style={{background:"#60a5fa"}}/> Cardio minutes</div>
-                    <div className="legend-row"><span className="swatch" style={{background:"#f59e0b"}}/> Total time</div>
+                  <div className="panel soft" style={{ marginTop: 10 }}>
+                    <div className="legend-row">
+                      <span className="swatch" style={{ background: "#22c55e" }} />
+                      Strength volume
+                    </div>
+                    <div className="legend-row">
+                      <span className="swatch" style={{ background: "#60a5fa" }} />
+                      Cardio minutes
+                    </div>
+                    <div className="legend-row">
+                      <span className="swatch" style={{ background: "#f59e0b" }} />
+                      Total time
+                    </div>
                   </div>
 
-                  <div className="panel soft" style={{marginTop:10}}>
+                  <div className="panel soft" style={{ marginTop: 10 }}>
                     <b>Status:</b>{" "}
-                    {(goal==="Cardio" && routineWeekly.minutesCardio >= 150) || 
-                    (goal!=="Cardio" && routineWeekly.sessions >= 2)
-                      ? "On track" : "Needs more days or minutes"}
+                    {(goal === "Cardio" && routineWeekly.minutesCardio >= 150) ||
+                    (goal !== "Cardio" && routineWeekly.sessions >= 2)
+                      ? "On track"
+                      : "Needs more days or minutes"}
                   </div>
 
                   <div className="grid1">
                     <Bars
                       data={[
-                        { label: "Sessions/wk", value: routineWeekly.sessions, color: "#22c55e", right: `${routineWeekly.sessions}` },
-                        { label: "Strength min/wk", value: routineWeekly.minutesStrength, color: "#3b82f6", right: `${routineWeekly.minutesStrength}m` },
-                        { label: "Cardio min/wk", value: routineWeekly.minutesCardio, color: "#60a5fa", right: `${routineWeekly.minutesCardio}m` },
-                        { label: "Total min/wk", value: routineWeekly.minutesTotal, color: "#f59e0b", right: `${routineWeekly.minutesTotal}m` },
+                        {
+                          label: "Sessions/wk",
+                          value: routineWeekly.sessions,
+                          color: "#22c55e",
+                          right: `${routineWeekly.sessions}`,
+                        },
+                        {
+                          label: "Strength min/wk",
+                          value: routineWeekly.minutesStrength,
+                          color: "#3b82f6",
+                          right: `${routineWeekly.minutesStrength}m`,
+                        },
+                        {
+                          label: "Cardio min/wk",
+                          value: routineWeekly.minutesCardio,
+                          color: "#60a5fa",
+                          right: `${routineWeekly.minutesCardio}m`,
+                        },
+                        {
+                          label: "Total min/wk",
+                          value: routineWeekly.minutesTotal,
+                          color: "#f59e0b",
+                          right: `${routineWeekly.minutesTotal}m`,
+                        },
                       ]}
                     />
                   </div>
@@ -649,22 +999,35 @@ export default function Health() {
                 <div className="grid1">
                   {goal === "Weight" && (
                     <>
-                      <div className="grid3" style={{marginBottom:8}}>
+                      <div className="grid3" style={{ marginBottom: 8 }}>
                         <Field label="Target change (lb)">
-                          <input className="input" type="number" value={weightChangeLbs}
-                                 onChange={(e)=>setWeightChangeLbs(Number(e.target.value)||0)} />
+                          <input
+                            className="input"
+                            type="number"
+                            value={weightChangeLbs}
+                            onChange={(e) => setWeightChangeLbs(Number(e.target.value) || 0)}
+                          />
                         </Field>
                         <Field label="Pace (lb / week)">
-                          <input className="input" type="number" step="0.1" value={paceLbsPerWk}
-                                 onChange={(e)=>setPaceLbsPerWk(Number(e.target.value)||0)} />
+                          <input
+                            className="input"
+                            type="number"
+                            step="0.1"
+                            value={paceLbsPerWk}
+                            onChange={(e) => setPaceLbsPerWk(Number(e.target.value) || 0)}
+                          />
                         </Field>
-                        <div className="hint" style={{alignSelf:"end"}}>Tip: −0.5 to −1.0 lb/wk is a steady, realistic pace.</div>
+                        <div className="hint" style={{ alignSelf: "end" }}>
+                          Tip: −0.5 to −1.0 lb/wk is a steady, realistic pace.
+                        </div>
                       </div>
                       {weightSeries.length > 1 && (
                         <>
                           <Sparkline points={weightSeries} color="#22c55e" />
                           <p className="hint">
-                            Start: {weightSeries[0]} lb · Target: {weightSeries.at(-1)} lb · Pace: {paceLbsPerWk} lb/wk · Timeline: {timeline}.
+                            Start: {weightSeries[0]} lb · Target:{" "}
+                            {weightSeries[weightSeries.length - 1]} lb · Pace: {paceLbsPerWk} lb/wk
+                            · Timeline: {timeline}.
                           </p>
                         </>
                       )}
@@ -674,7 +1037,8 @@ export default function Health() {
                     <>
                       <Sparkline points={strengthIndex} color="#3b82f6" />
                       <p className="hint">
-                        With {routinePlan.length} sessions/week & protein target, expect ~{round(strengthIndex.at(-1) - 100, 1)}% in {timeline}.
+                        With {routinePlan.length} sessions/week & protein target, expect ~
+                        {round(strengthIndex[strengthIndex.length - 1] - 100, 1)}% in {timeline}.
                       </p>
                     </>
                   )}
@@ -682,12 +1046,16 @@ export default function Health() {
                     <>
                       <Sparkline points={cardioIndex} color="#60a5fa" />
                       <p className="hint">
-                        Minutes/week: {routineWeekly.minutesCardio} (cardio). Consistency drives gains—target ≥150 min/week.
+                        Minutes/week: {routineWeekly.minutesCardio} (cardio). Consistency drives
+                        gains—target ≥150 min/week.
                       </p>
                     </>
                   )}
                   {goal === "Wellness" && (
-                    <p className="hint">Keep routine consistency and sleep habits; expect gradual energy & recovery improvements over {timeline}.</p>
+                    <p className="hint">
+                      Keep routine consistency and sleep habits; expect gradual energy & recovery
+                      improvements over {timeline}.
+                    </p>
                   )}
                 </div>
               )}
@@ -704,7 +1072,10 @@ export default function Health() {
                   </ul>
                   <h3>Weekly playbook</h3>
                   <ul>
-                    <li>Train {routinePlan.length} day(s) • {minutes} min • {focus}. Put them on your calendar.</li>
+                    <li>
+                      Train {routinePlan.length} day(s) • {minutes} min • {focus}. Put them on your
+                      calendar.
+                    </li>
                     <li>Batch-cook carbs + protein once on weekends.</li>
                     <li>Deload every 4–6 weeks (reduce sets by ~30%).</li>
                     <li>Review progress monthly; adjust calories by ±100–150 if trend stalls.</li>
@@ -719,23 +1090,54 @@ export default function Health() {
                     <h3>Today</h3>
                     <div className="grid3">
                       <Field label="Date">
-                        <input className="input" type="date" value={tDate} onChange={(e)=>onChangeDate(e.target.value)} />
+                        <input
+                          className="input"
+                          type="date"
+                          value={tDate}
+                          onChange={(e) => onChangeDate(e.target.value)}
+                        />
                       </Field>
                       <Field label={`Weight (${weightUnit})`}>
-                        <input className="input" type="number"
-                          value={weightUnit==="kg" ? (tWeightKg ?? "") : (tWeightKg!==""? round(kgToLb(+tWeightKg),1):"")}
-                          onChange={(e)=>{
+                        <input
+                          className="input"
+                          type="number"
+                          value={
+                            weightUnit === "kg"
+                              ? tWeightKg ?? ""
+                              : tWeightKg !== ""
+                              ? round(kgToLb(+tWeightKg), 1)
+                              : ""
+                          }
+                          onChange={(e) => {
                             const v = e.target.value;
-                            if (v==="" || isNaN(v)) { setTWeightKg(""); return; }
-                            setTWeightKg(weightUnit==="kg" ? +v : lbToKg(+v));
-                          }} />
+                            if (v === "" || isNaN(v)) {
+                              setTWeightKg("");
+                              return;
+                            }
+                            setTWeightKg(weightUnit === "kg" ? +v : lbToKg(+v));
+                          }}
+                        />
                       </Field>
-                      <Field label={`Water (${Math.round(tWaterMl/10)/100} L)`}>
+                      <Field label={`Water (${Math.round(tWaterMl / 10) / 100} L)`}>
                         <div className="water-row">
-                          <div className="water-track"><div className="water-fill" style={{ width: `${Math.min(100, (tWaterMl/(waterL*1000||1))*100)}%` }} /></div>
+                          <div className="water-track">
+                            <div
+                              className="water-fill"
+                              style={{
+                                width: `${Math.min(
+                                  100,
+                                  (tWaterMl / ((waterL * 1000) || 1)) * 100
+                                )}%`,
+                              }}
+                            />
+                          </div>
                           <div className="chips">
-                            <button className="chip" onClick={()=>setTWaterMl(m=>m+250)}>+250 ml</button>
-                            <button className="chip" onClick={()=>setTWaterMl(0)}>Reset</button>
+                            <button className="chip" onClick={() => setTWaterMl((m) => m + 250)}>
+                              +250 ml
+                            </button>
+                            <button className="chip" onClick={() => setTWaterMl(0)}>
+                              Reset
+                            </button>
                           </div>
                         </div>
                       </Field>
@@ -744,26 +1146,78 @@ export default function Health() {
                     <div className="grid1">
                       <div className="panel soft">
                         <div className="panel-title">Workouts</div>
-                        <div className="chips" style={{marginBottom:8}}>
-                          <button className="chip" onClick={()=>setTWorkoutEntries(arr=>[...arr,{type:"Full-body", minutes:minutes}])}>+ Add workout</button>
+                        <div className="chips" style={{ marginBottom: 8 }}>
+                          <button
+                            className="chip"
+                            onClick={() =>
+                              setTWorkoutEntries((arr) => [
+                                ...arr,
+                                { type: "Full-body", minutes: minutes },
+                              ])
+                            }
+                          >
+                            + Add workout
+                          </button>
                           <div className="chips">
-                            <button className={`chip ${tWorkoutDone?'on':''}`} onClick={()=>setTWorkoutDone(v=>!v)}>{tWorkoutDone?"Workout done":"Workout not done"}</button>
+                            <button
+                              className={`chip ${tWorkoutDone ? "on" : ""}`}
+                              onClick={() => setTWorkoutDone((v) => !v)}
+                            >
+                              {tWorkoutDone ? "Workout done" : "Workout not done"}
+                            </button>
                           </div>
                         </div>
-                        {tWorkoutEntries.length === 0 && <div className="hint">No workouts logged.</div>}
-                        {tWorkoutEntries.map((w,i)=>(
+                        {tWorkoutEntries.length === 0 && (
+                          <div className="hint">No workouts logged.</div>
+                        )}
+                        {tWorkoutEntries.map((w, i) => (
                           <div key={i} className="routine-row">
                             <div className="grid3">
                               <Field label="Type">
-                                <select className="input" value={w.type} onChange={(e)=>setTWorkoutEntries(arr=>arr.map((x,idx)=>idx===i?{...x,type:e.target.value}:x))}>
-                                  <option>Full-body</option><option>Upper</option><option>Lower</option><option>Push</option><option>Pull</option><option>Cardio</option>
+                                <select
+                                  className="input"
+                                  value={w.type}
+                                  onChange={(e) =>
+                                    setTWorkoutEntries((arr) =>
+                                      arr.map((x, idx) =>
+                                        idx === i ? { ...x, type: e.target.value } : x
+                                      )
+                                    )
+                                  }
+                                >
+                                  <option>Full-body</option>
+                                  <option>Upper</option>
+                                  <option>Lower</option>
+                                  <option>Push</option>
+                                  <option>Pull</option>
+                                  <option>Cardio</option>
                                 </select>
                               </Field>
                               <Field label="Minutes">
-                                <input className="input" type="number" value={w.minutes} onChange={(e)=>setTWorkoutEntries(arr=>arr.map((x,idx)=>idx===i?{...x,minutes:+e.target.value}:x))}/>
+                                <input
+                                  className="input"
+                                  type="number"
+                                  value={w.minutes}
+                                  onChange={(e) =>
+                                    setTWorkoutEntries((arr) =>
+                                      arr.map((x, idx) =>
+                                        idx === i ? { ...x, minutes: +e.target.value } : x
+                                      )
+                                    )
+                                  }
+                                />
                               </Field>
                               <Field label="Remove">
-                                <button className="chip" onClick={()=>setTWorkoutEntries(arr=>arr.filter((_,idx)=>idx!==i))}>Delete</button>
+                                <button
+                                  className="chip"
+                                  onClick={() =>
+                                    setTWorkoutEntries((arr) =>
+                                      arr.filter((_, idx) => idx !== i)
+                                    )
+                                  }
+                                >
+                                  Delete
+                                </button>
                               </Field>
                             </div>
                           </div>
@@ -772,21 +1226,56 @@ export default function Health() {
 
                       <div className="panel soft">
                         <div className="panel-title">Meals</div>
-                        <div className="chips" style={{marginBottom:8}}>
-                          <button className="chip" onClick={()=>setTMeals(arr=>[...arr,{name:"Meal", cal:500}])}>+ Add meal</button>
+                        <div className="chips" style={{ marginBottom: 8 }}>
+                          <button
+                            className="chip"
+                            onClick={() =>
+                              setTMeals((arr) => [...arr, { name: "Meal", cal: 500 }])
+                            }
+                          >
+                            + Add meal
+                          </button>
                         </div>
                         {tMeals.length === 0 && <div className="hint">No meals logged.</div>}
-                        {tMeals.map((m,i)=>(
+                        {tMeals.map((m, i) => (
                           <div key={i} className="routine-row">
                             <div className="grid3">
                               <Field label="Name">
-                                <input className="input" value={m.name} onChange={(e)=>setTMeals(arr=>arr.map((x,idx)=>idx===i?{...x,name:e.target.value}:x))}/>
+                                <input
+                                  className="input"
+                                  value={m.name}
+                                  onChange={(e) =>
+                                    setTMeals((arr) =>
+                                      arr.map((x, idx) =>
+                                        idx === i ? { ...x, name: e.target.value } : x
+                                      )
+                                    )
+                                  }
+                                />
                               </Field>
                               <Field label="Calories">
-                                <input className="input" type="number" value={m.cal} onChange={(e)=>setTMeals(arr=>arr.map((x,idx)=>idx===i?{...x,cal:+e.target.value}:x))}/>
+                                <input
+                                  className="input"
+                                  type="number"
+                                  value={m.cal}
+                                  onChange={(e) =>
+                                    setTMeals((arr) =>
+                                      arr.map((x, idx) =>
+                                        idx === i ? { ...x, cal: +e.target.value } : x
+                                      )
+                                    )
+                                  }
+                                />
                               </Field>
                               <Field label="Remove">
-                                <button className="chip" onClick={()=>setTMeals(arr=>arr.filter((_,idx)=>idx!==i))}>Delete</button>
+                                <button
+                                  className="chip"
+                                  onClick={() =>
+                                    setTMeals((arr) => arr.filter((_, idx) => idx !== i))
+                                  }
+                                >
+                                  Delete
+                                </button>
                               </Field>
                             </div>
                           </div>
@@ -795,7 +1284,13 @@ export default function Health() {
 
                       <div className="panel soft">
                         <div className="panel-title">Notes</div>
-                        <textarea className="input" rows={3} placeholder="How did today feel?" value={tNotes} onChange={(e)=>setTNotes(e.target.value)} />
+                        <textarea
+                          className="input"
+                          rows={3}
+                          placeholder="How did today feel?"
+                          value={tNotes}
+                          onChange={(e) => setTNotes(e.target.value)}
+                        />
                       </div>
                     </div>
                   </div>
@@ -803,27 +1298,45 @@ export default function Health() {
                   <div>
                     <h3>Last 30 days</h3>
                     <div className="panel soft">
-                      <div className="mini-chart"><div className="mini-title">Weight trend (lb)</div><Sparkline points={weightSeries30} color="#3b82f6" /></div>
-                      <div className="mini-chart"><div className="mini-title">Water per day (L)</div><Sparkline points={waterSeries30} color="#0ea5a3" /></div>
+                      <div className="mini-chart">
+                        <div className="mini-title">Weight trend (lb)</div>
+                        <Sparkline points={weightSeries30} color="#3b82f6" />
+                      </div>
+                      <div className="mini-chart">
+                        <div className="mini-title">Water per day (L)</div>
+                        <Sparkline points={waterSeries30} color="#0ea5a3" />
+                      </div>
                       <div className="mini-stats">
-                        <div className="stat"><div className="k">Workouts (7d)</div><div className="v">{workoutCount7}/7</div></div>
-                        <div className="stat"><div className="k">Entries (30d)</div><div className="v">{hist.length}</div></div>
+                        <div className="stat">
+                          <div className="k">Workouts (7d)</div>
+                          <div className="v">{workoutCount7}/7</div>
+                        </div>
+                        <div className="stat">
+                          <div className="k">Entries (30d)</div>
+                          <div className="v">{hist.length}</div>
+                        </div>
                       </div>
                     </div>
 
                     <h4>Raw log (latest 10)</h4>
                     <div className="table">
                       <div className="tr tr-head">
-                        <div className="td">Date</div><div className="td">Weight (kg)</div><div className="td">Water (ml)</div><div className="td">Workout</div>
+                        <div className="td">Date</div>
+                        <div className="td">Weight (kg)</div>
+                        <div className="td">Water (ml)</div>
+                        <div className="td">Workout</div>
                       </div>
-                      {hist.slice(-10).reverse().map((h,i)=>(
-                        <div className="tr" key={i}>
-                          <div className="td">{h.date}</div>
-                          <div className="td">{h.weightKg ?? "—"}</div>
-                          <div className="td">{h.waterMl ?? 0}</div>
-                          <div className="td">{h.workout ? "✓" : "—"}</div>
-                        </div>
-                      ))}
+                      {hist
+                        .slice(-10)
+                        .reverse()
+                        .map((h, i) => (
+                          <div className="tr" key={i}>
+                            <div className="td">{h.date}</div>
+                            <div className="td">{h.weightKg ?? "—"}</div>
+                            <div className="td">{h.waterMl ?? 0}</div>
+                            <div className="td">{h.workout ? "✓" : "—"}</div>
+                          </div>
+                        ))}
                     </div>
                   </div>
                 </div>

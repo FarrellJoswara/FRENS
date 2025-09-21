@@ -1,22 +1,83 @@
-.hub-root{ padding:16px; }
-.hub-head{ display:flex; align-items:center; gap:12px; margin-bottom:12px; }
-.hub-head h1{ margin:0; font-size:24px; font-weight:800; }
-.hub-new{ margin-left:auto; display:flex; gap:8px; }
-.hub-input{ padding:8px 10px; border:1px solid #dbe3ea; border-radius:10px; }
-.hub-btn{ padding:8px 10px; border:1px solid #dbe3ea; border-radius:10px; background:#fff; cursor:pointer; }
-.hub-btn.primary{ background:#0ea5a3; border-color:#0ea5a3; color:#fff; }
-.hub-btn.danger{ border-color:#fecaca; background:#fff1f2; }
+.lyfe-root {
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.lyfe-overlay {
+  position: absolute; inset: 0;
+  background: radial-gradient(70% 80% at 50% 20%, rgba(255,255,255,0.55), rgba(255,255,255,0.15));
+  pointer-events: none;
+}
 
-.hub-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px; }
-.hub-card{ border:1px solid #e5edf3; border-radius:14px; padding:12px; background:#fff; box-shadow:0 6px 14px rgba(0,0,0,.06); }
-.hub-card.active{ outline:2px solid rgba(14,165,163,.28); }
+.lyfe-card {
+  position: relative;
+  margin: 32px auto;
+  width: min(1100px, 92vw);
+  background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
+  border: 1px solid rgba(2,6,23,0.08);
+  border-radius: 22px;
+  box-shadow: 0 20px 60px rgba(2,6,23,0.15);
+  padding: 22px 24px 28px;
+  backdrop-filter: blur(6px);
+}
 
-.hub-title{ display:flex; justify-content:space-between; gap:8px; }
-.hub-rename{ border:1px dashed #dbe3ea; border-radius:8px; padding:6px 8px; font-weight:700; width:60%; }
-.hub-actions{ display:flex; gap:6px; }
+.lyfe-head {
+  display: flex; align-items: end; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.lyfe-head h1 { margin: 0; font-size: 28px; letter-spacing: -0.02em; }
+.lyfe-head p { margin: 2px 0 0; color: #475569; }
+.active-pill {
+  background: #ecfeff; color: #0e7490;
+  border: 1px solid #a5f3fc; padding: 6px 10px; border-radius: 999px; font-weight: 700;
+}
 
-.hub-summary{ margin:10px 0; font-size:13px; color:#334155; display:grid; gap:4px; }
-.hub-summary span{ color:#64748b; }
-.hub-summary .muted{ color:#8a9aa5; font-size:12px; }
+.panel { margin-top: 16px; padding: 16px; border-radius: 16px; border: 1px solid #e2e8f0; background: #ffffffc9; }
+.panel.soft { background: #fff; }
+.panel-title { margin: 0 0 10px; font-weight: 800; }
 
-.hub-buttons{ display:flex; gap:8px; flex-wrap:wrap; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 840px) { .grid2 { grid-template-columns: 1fr; } }
+
+.field { display: block; }
+.field-label { font-size: 13px; color: #334155; margin-bottom: 6px; }
+.input {
+  width: 100%; padding: 10px 12px; border-radius: 10px;
+  border: 1px solid #cbd5e1; font-size: 14px; background: #ffffffea;
+}
+.input:focus { outline: none; border-color: #38bdf8; box-shadow: 0 0 0 3px rgba(56,189,248,.2); }
+.hint { margin-top: 6px; font-size: 12px; color: #64748b; }
+
+.actions { margin-top: 14px; display: flex; gap: 10px; }
+.primary {
+  background: linear-gradient(180deg, #22c55e, #16a34a);
+  color: white; border: none; border-radius: 12px; padding: 10px 14px; font-weight: 800; cursor: pointer;
+}
+.primary:disabled { opacity: .6; cursor: not-allowed; }
+.secondary {
+  background: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1; border-radius: 12px; padding: 10px 14px; font-weight: 700; cursor: pointer;
+}
+.secondary:hover { background: #e2e8f0; }
+
+.lyfe-list { display: grid; gap: 12px; }
+.lyfe-item {
+  display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center;
+  border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px; background: #fff;
+}
+.lyfe-item.on { border-color: #86efac; box-shadow: inset 0 0 0 2px #bbf7d0; }
+.lyfe-main .name { font-weight: 800; font-size: 16px; }
+.lyfe-main .meta { color: #475569; font-size: 13px; margin-top: 2px; }
+
+.lyfe-actions { display: flex; gap: 8px; }
+.chip {
+  background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 32px; padding: 6px 10px; font-weight: 700; cursor: pointer; font-size: 13px;
+}
+.chip:hover { background: #eef2f7; }
+.chip.danger { border-color: #fecaca; color: #b91c1c; background: #fff1f2; }
+.next-steps { display: flex; align-items: center; justify-content: space-between; }
+.ns-text { font-weight: 700; }
+.ns-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.empty { color: #64748b; }

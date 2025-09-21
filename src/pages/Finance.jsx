@@ -1,8 +1,20 @@
 import "./Finance.css";
 import FinanceBg from "../assets/Finance.svg";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useLyfeSlice } from "../lyfe/LyfeContext";
+import { useLyfe, useLyfeSlice } from "../lyfe/LyfeContext";
+
+function bandToMonthlyRangeStr(label) {
+  const nums = (label.match(/\d+/g) || []).map((n) => parseInt(n, 10));
+  let loA = 20, hiA = 30;
+  if (nums.length >= 2) { loA = nums[0]; hiA = nums[1]; }
+  else if (nums.length === 1) { loA = nums[0]; hiA = nums[0] + 20; }
+  const loNet = (loA * 1000) * 0.72;
+  const hiNet = (hiA * 1000) * 0.72;
+  const loM = Math.round(loNet / 12 / 100) * 100;
+  const hiM = Math.round(hiNet / 12 / 100) * 100;
+  return `${Math.max(800, loM)}-${Math.min(10000, hiM)}`;
+}
 
 /** ---------- helpers ---------- */
 const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
@@ -24,6 +36,9 @@ const BASE_COSTS = {
 export default function Finance() {
   /** ---------- load per-lyfe slice ---------- */
   const { lyfeId } = useParams();
+  const { getById } = useLyfe();
+  const lyfe = getById(lyfeId);
+  const initFromMetaOnce = useRef(false);
   const { slice, setSlice } = useLyfeSlice("finance", lyfeId);
   const saved = slice?.inputs || {};
 
@@ -32,6 +47,14 @@ export default function Finance() {
 
   /** 2) SITUATION */
   const [incomeRange, setIncomeRange] = useState(saved.incomeRange ?? "3000-4000");
+  useEffect(() => {
+    if (initFromMetaOnce.current) return;
+    const band = lyfe?.meta?.salaryBand;
+    if (band) {
+      setIncomeRange(bandToMonthlyRangeStr(band));
+      initFromMetaOnce.current = true;
+    }
+  }, [lyfe?.meta?.salaryBand]);
   const [living, setLiving]         = useState(saved.living ?? "roommates"); // campus | roommates | solo
   const [cityCost, setCityCost]     = useState(saved.cityCost ?? "avg");     // low | avg | high
   const monthlyIncome = useMemo(() => incomeMid(incomeRange), [incomeRange]);
