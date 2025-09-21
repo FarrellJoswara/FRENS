@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import LoginPage from "./pages/LoginPage";
 import FrontPage from "./pages/FrontPage";
+import Whiteboard from "./pages/WhiteBoard"; // <-- ADD THIS
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -46,6 +47,14 @@ function App() {
               <ProtectedRoute>
                 <FrontPage />
               </ProtectedRoute>
+            }
+          />
+          <Route
+          path="/whiteboard"
+          element={
+            <ProtectedRoute>
+              <Whiteboard />
+            </ProtectedRoute>
             }
           />
         </Routes>
