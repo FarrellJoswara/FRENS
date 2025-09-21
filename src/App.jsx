@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import LoginPage from "./pages/LoginPage";
 import FrontPage from "./pages/FrontPage";
+import Calendar from './pages/calendar';
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -48,6 +49,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/calendar" element={<Calendar />} />
         </Routes>
       </Router>
     </GoogleOAuthProvider>
