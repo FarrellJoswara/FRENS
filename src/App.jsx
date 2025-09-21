@@ -1,3 +1,4 @@
+// src/App.jsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
@@ -15,7 +16,7 @@ import Map from "./pages/social/map";
 import Split from "./pages/social/split";
 import List from "./pages/social/list";
 
-import { LyfeProvider } from "./lyfe/LyfeContext"; // ⬅️ make sure this file exists
+import { LyfeProvider, useLyfe } from "./lyfe/LyfeContext"; // ⬅️ added useLyfe
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -47,6 +48,16 @@ function FinanceRoute() {
 function HealthRoute() {
   const { lyfeId } = useParams();
   return <Health lyfeId={lyfeId} />;
+}
+
+/* ---------- Index redirects that jump to the active lyfe if present ---------- */
+function FinanceIndexRedirect() {
+  const { currentId } = useLyfe();
+  return currentId ? <Navigate to={`/finance/${currentId}`} replace /> : <Navigate to="/lyfe" replace />;
+}
+function HealthIndexRedirect() {
+  const { currentId } = useLyfe();
+  return currentId ? <Navigate to={`/health/${currentId}`} replace /> : <Navigate to="/lyfe" replace />;
 }
 
 function App() {
@@ -105,11 +116,29 @@ function App() {
             }
           />
 
-          {/* legacy paths → send users to pick a lyfe */}
-          <Route path="/finance" element={<Navigate to="/lyfe" replace />} />
-          <Route path="/health" element={<Navigate to="/lyfe" replace />} />
+          {/* Base paths → auto-jump to current lyfe (or /lyfe if none) */}
+          <Route
+            path="/finance"
+            element={
+              <ProtectedRoute>
+                <WithLyfe>
+                  <FinanceIndexRedirect />
+                </WithLyfe>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/health"
+            element={
+              <ProtectedRoute>
+                <WithLyfe>
+                  <HealthIndexRedirect />
+                </WithLyfe>
+              </ProtectedRoute>
+            }
+          />
 
-          {/* other pages (you can include WithLyfe if you want active-lyfe chips available) */}
+          {/* other pages (kept inside WithLyfe so the active-lyfe badge can work) */}
           <Route
             path="/calendar"
             element={
