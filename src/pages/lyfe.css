@@ -1,0 +1,22 @@
+.hub-root{ padding:16px; }
+.hub-head{ display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+.hub-head h1{ margin:0; font-size:24px; font-weight:800; }
+.hub-new{ margin-left:auto; display:flex; gap:8px; }
+.hub-input{ padding:8px 10px; border:1px solid #dbe3ea; border-radius:10px; }
+.hub-btn{ padding:8px 10px; border:1px solid #dbe3ea; border-radius:10px; background:#fff; cursor:pointer; }
+.hub-btn.primary{ background:#0ea5a3; border-color:#0ea5a3; color:#fff; }
+.hub-btn.danger{ border-color:#fecaca; background:#fff1f2; }
+
+.hub-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px; }
+.hub-card{ border:1px solid #e5edf3; border-radius:14px; padding:12px; background:#fff; box-shadow:0 6px 14px rgba(0,0,0,.06); }
+.hub-card.active{ outline:2px solid rgba(14,165,163,.28); }
+
+.hub-title{ display:flex; justify-content:space-between; gap:8px; }
+.hub-rename{ border:1px dashed #dbe3ea; border-radius:8px; padding:6px 8px; font-weight:700; width:60%; }
+.hub-actions{ display:flex; gap:6px; }
+
+.hub-summary{ margin:10px 0; font-size:13px; color:#334155; display:grid; gap:4px; }
+.hub-summary span{ color:#64748b; }
+.hub-summary .muted{ color:#8a9aa5; font-size:12px; }
+
+.hub-buttons{ display:flex; gap:8px; flex-wrap:wrap; }

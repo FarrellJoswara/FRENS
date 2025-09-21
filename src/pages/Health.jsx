@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "./Health.css";
 import HealthBg from "../assets/Health.svg";
+import { useParams } from "react-router-dom";
+import { useLyfeSlice } from "../lyfe/LyfeContext";
 
 /* ---------- math & helpers ---------- */
 const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
@@ -173,33 +175,59 @@ function buildRoutine({ focus, daysSel, minutes }) {
 
 /* ======================= MAIN ======================= */
 export default function Health() {
+  /** ---------- load per-lyfe slice ---------- */
+  const { lyfeId } = useParams();
+  const { slice, setSlice } = useLyfeSlice("health", lyfeId);
+  const saved = slice?.inputs || {};
+
   const [step, setStep] = useState(1);
-  const [goal, setGoal] = useState(""); // Weight | Strength | Cardio | Wellness
-  const [timeline, setTimeline] = useState("8 weeks");
+  const [goal, setGoal] = useState(saved.goal ?? ""); // Weight | Strength | Cardio | Wellness
+  const [timeline, setTimeline] = useState(saved.timeline ?? "8 weeks");
 
   /* ===== Units (kg/lb, cm/ft+in) ===== */
-  const [weightUnit, setWeightUnit] = useState("kg");    // "kg" | "lb"
-  const [heightUnit, setHeightUnit] = useState("cm");    // "cm" | "ftin"
+  const [weightUnit, setWeightUnit] = useState(saved.weightUnit ?? "kg"); // "kg" | "lb"
+  const [heightUnit, setHeightUnit] = useState(saved.heightUnit ?? "cm"); // "cm" | "ftin"
 
   // inputs (internally store metric)
-  const [age, setAge] = useState("");
-  const [sex, setSex] = useState("F");
-  const [heightCm, setHeightCm] = useState(""); // internally cm
-  const [heightFt, setHeightFt] = useState(5);  // shown if ft+in selected
-  const [heightIn, setHeightIn] = useState(5);
-  const [weightKg, setWeightKg] = useState(""); // internally kg
-  const [activity, setActivity] = useState("light");
-  const [diet, setDiet] = useState("Omni");
+  const [age, setAge] = useState(saved.age ?? "");
+  const [sex, setSex] = useState(saved.sex ?? "F");
+  const [heightCm, setHeightCm] = useState(saved.heightCm ?? ""); // internally cm
+  const [heightFt, setHeightFt] = useState(saved.heightFt ?? 5);  // shown if ft+in selected
+  const [heightIn, setHeightIn] = useState(saved.heightIn ?? 5);
+  const [weightKg, setWeightKg] = useState(saved.weightKg ?? ""); // internally kg
+  const [activity, setActivity] = useState(saved.activity ?? "light");
+  const [diet, setDiet] = useState(saved.diet ?? "Omni");
+
+  // routine params
+  const [focus, setFocus] = useState(saved.focus ?? "Full-body");
+  const [minutes, setMinutes] = useState(saved.minutes ?? 45);
+  const [daysSel, setDaysSel] = useState(saved.daysSel ?? [true, false, true, false, true, false, false]);
+
+  /** ---------- hydrate when :lyfeId changes ---------- */
+  useEffect(() => {
+    const sv = (slice && slice.inputs) || {};
+    setGoal(sv.goal ?? "");
+    setTimeline(sv.timeline ?? "8 weeks");
+    setWeightUnit(sv.weightUnit ?? "kg");
+    setHeightUnit(sv.heightUnit ?? "cm");
+
+    setAge(sv.age ?? "");
+    setSex(sv.sex ?? "F");
+    setHeightCm(sv.heightCm ?? "");
+    setHeightFt(sv.heightFt ?? 5);
+    setHeightIn(sv.heightIn ?? 5);
+    setWeightKg(sv.weightKg ?? "");
+    setActivity(sv.activity ?? "light");
+    setDiet(sv.diet ?? "Omni");
+
+    setFocus(sv.focus ?? "Full-body");
+    setMinutes(sv.minutes ?? 45);
+    setDaysSel(sv.daysSel ?? [true, false, true, false, true, false, false]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lyfeId]);
 
   // when unit toggles change, convert the existing stored values
-  const toggleWeightUnit = (u) => {
-    if (u === weightUnit) return;
-    if (weightKg !== "") {
-      const newKg = u === "lb" ? weightKg : weightKg; // we keep metric internally
-      // nothing to change internally; only display will differ
-    }
-    setWeightUnit(u);
-  };
+  const toggleWeightUnit = (u) => { if (u !== weightUnit) setWeightUnit(u); };
   const toggleHeightUnit = (u) => {
     if (u === heightUnit) return;
     if (u === "ftin" && heightCm) {
@@ -217,7 +245,6 @@ export default function Health() {
     ? (weightKg ?? "")
     : (weightKg !== "" ? round(kgToLb(+weightKg), 1) : "");
   const setWeightDisplay = (val) => {
-    // incoming val is in current unit; convert to kg
     if (val === "" || isNaN(val)) { setWeightKg(""); return; }
     const num = +val;
     setWeightKg(weightUnit === "kg" ? num : lbToKg(num));
@@ -230,7 +257,6 @@ export default function Health() {
   };
 
   useEffect(() => {
-    // keep heightCm in sync when editing ft/in
     if (heightUnit === "ftin") {
       const cm = cmFromFtIn(+heightFt || 0, +heightIn || 0);
       setHeightCm(cm);
@@ -271,9 +297,6 @@ export default function Health() {
   const waterL = validInfo ? clamp(round(+weightKg * 0.035, 1), 1.8, 3.5) : 0;
 
   // routine
-  const [focus, setFocus] = useState("Full-body");
-  const [minutes, setMinutes] = useState(45);
-  const [daysSel, setDaysSel] = useState([true, false, true, false, true, false, false]);
   const { plan: routinePlan, weekly: routineWeekly } = useMemo(
     () => buildRoutine({ focus, daysSel, minutes }),
     [focus, daysSel, minutes]
@@ -290,9 +313,7 @@ export default function Health() {
     if (goal !== "Weight" || !weightKg) return [];
     const startLb = kgToLb(+weightKg);
     const weeksInt = weeks || 8;
-    const byPaceEnd = startLb + paceLbsPerWk * weeksInt;
     const byChangeEnd = startLb + weightChangeLbs;
-    // prefer the explicit change
     const endLb = byChangeEnd;
     const arr = [];
     for (let w = 0; w <= weeksInt; w++) {
@@ -300,7 +321,7 @@ export default function Health() {
       arr.push(round(v, 1));
     }
     return arr;
-  }, [goal, weightKg, weeks, paceLbsPerWk, weightChangeLbs]);
+  }, [goal, weightKg, weeks, weightChangeLbs]);
 
   const strengthIndex = useMemo(() => {
     if (goal !== "Strength") return [];
@@ -375,6 +396,25 @@ export default function Health() {
   const weightSeries30 = hist.map(h => (h.weightKg ? kgToLb(h.weightKg) : null)).filter(v => v != null);
   const waterSeries30 = hist.map(h => (h.waterMl ?? 0) / 1000);
   const workoutCount7 = hist.slice(-7).filter(h => h.workout).length;
+
+  /** ---------- persist to lyfe ---------- */
+  useEffect(() => {
+    setSlice({
+      inputs: {
+        goal, timeline, weightUnit, heightUnit,
+        age, sex, heightCm, heightFt, heightIn, weightKg,
+        activity, diet, focus, minutes, daysSel,
+      },
+      computed: {
+        calorieTarget, proteinG, waterL, routineDays: routinePlan.length,
+      },
+    });
+  }, [
+    goal, timeline, weightUnit, heightUnit,
+    age, sex, heightCm, heightFt, heightIn, weightKg,
+    activity, diet, focus, minutes, daysSel,
+    calorieTarget, proteinG, waterL, routinePlan.length,
+  ]);
 
   /* ---------- render ---------- */
   return (
