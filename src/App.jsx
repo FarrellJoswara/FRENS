@@ -4,7 +4,8 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import LoginPage from "./pages/LoginPage";
 import FrontPage from "./pages/FrontPage";
 import Calendar from "./pages/calendar";
-import Finance from "./pages/Finance"; // ← NEW
+import Finance from "./pages/Finance";
+import Health from "./pages/Health";
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -52,6 +53,7 @@ function App() {
           />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/finance" element={<Finance />} /> {/* ← NEW: direct access */}
+          <Route path="/health" element={<Health />} />
         </Routes>
       </Router>
     </GoogleOAuthProvider>
