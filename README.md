@@ -1,3 +1,6 @@
+![LifeBalance App Demo](./assets/life-path.png)
+
+
 # Lyfein5 App
 
 Lyfein5 is a smart, integrated lifestyle app designed to help you live more intentionally. Unlike traditional apps that focus on just one area of life, Lyfein5 connects your activities, goals, and progress, showing how your choices in one area affect others. It’s a tool for making smarter decisions, staying balanced, and getting the most out of your time, energy, and resources.
