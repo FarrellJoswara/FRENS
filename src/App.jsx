@@ -10,7 +10,7 @@ import Finance from "./pages/Finance";
 import Health from "./pages/Health";
 import Lyfe from "./pages/lyfe";
 import Personal from "./pages/personal";
-import Social from "./pages/social/social";
+import Goals from "./pages/Goals"; // new Goals page
 import Whiteboard from "./pages/whiteboard";
 import Map from "./pages/social/map";
 import Split from "./pages/social/split";
@@ -18,6 +18,7 @@ import List from "./pages/social/list";
 import Tutorial from "./pages/tutorial";
 
 import { LyfeProvider, useLyfe } from "./lyfe/LyfeContext";
+import Layout from "./components/Layout";
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -34,7 +35,9 @@ function ProtectedRoute({ children }) {
     console.error("Failed to decode token:", e);
   }
 
-  return typeof children === "function" ? children(user) : React.cloneElement(children, { user });
+  return typeof children === "function"
+    ? children(user)
+    : React.cloneElement(children, { user });
 }
 
 /* ---------- WithLyfe ---------- */
@@ -42,7 +45,7 @@ function WithLyfe({ children, user }) {
   return <LyfeProvider userEmail={user?.email}>{children}</LyfeProvider>;
 }
 
-/* ---------- Route wrappers for :lyfeId ---------- */
+/* ---------- Route wrappers ---------- */
 function FinanceRoute() {
   const { lyfeId } = useParams();
   return <Finance lyfeId={lyfeId} />;
@@ -52,14 +55,18 @@ function HealthRoute() {
   return <Health lyfeId={lyfeId} />;
 }
 
-/* ---------- Index redirects using Lyfe context ---------- */
+/* ---------- Index redirects ---------- */
 function FinanceIndexRedirect() {
   const { currentId } = useLyfe();
-  return currentId ? <Navigate to={`/finance/${currentId}`} replace /> : <Navigate to="/lyfe" replace />;
+  return currentId
+    ? <Navigate to={`/finance/${currentId}`} replace />
+    : <Navigate to="/lyfe" replace />;
 }
 function HealthIndexRedirect() {
   const { currentId } = useLyfe();
-  return currentId ? <Navigate to={`/health/${currentId}`} replace /> : <Navigate to="/lyfe" replace />;
+  return currentId
+    ? <Navigate to={`/health/${currentId}`} replace />
+    : <Navigate to="/lyfe" replace />;
 }
 
 export default function App() {
@@ -71,192 +78,54 @@ export default function App() {
     <GoogleOAuthProvider clientId={clientId || "missing-client-id"}>
       <Router>
         <Routes>
-          {/* Public routes */}
+          {/* Public route */}
           <Route path="/" element={<LoginPage />} />
 
-          {/* Protected routes */}
+          {/* Protected with Layout */}
           <Route
-            path="/front"
             element={
               <ProtectedRoute>
                 {(user) => (
                   <WithLyfe user={user}>
-                    <FrontPage />
+                    <Layout />
                   </WithLyfe>
                 )}
               </ProtectedRoute>
             }
-          />
-          <Route
-            path="/lyfe"
-            element={
-              <ProtectedRoute>
-                {(user) => (
-                  <WithLyfe user={user}>
-                    <Lyfe />
-                  </WithLyfe>
-                )}
-              </ProtectedRoute>
-            }
-          />
+          >
+            <Route path="/front" element={<FrontPage />} />
+            <Route path="/lyfe" element={<Lyfe />} />
+            <Route path="/calendar" element={<Calendar />} />
 
-          {/* Finance */}
-          <Route
-            path="/finance/:lyfeId"
-            element={
-              <ProtectedRoute>
-                {(user) => (
-                  <WithLyfe user={user}>
-                    <FinanceRoute />
-                  </WithLyfe>
-                )}
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/finance"
-            element={
-              <ProtectedRoute>
-                {(user) => (
-                  <WithLyfe user={user}>
-                    <FinanceIndexRedirect />
-                  </WithLyfe>
-                )}
-              </ProtectedRoute>
-            }
-          />
+            {/* Personal and nested routes */}
+            <Route path="/personal" element={<Personal />} />
+            <Route path="/personal/health" element={<HealthIndexRedirect />} />
+            <Route path="/personal/goals" element={<Goals />} />
 
-          {/* Health */}
-          <Route
-            path="/health/:lyfeId"
-            element={
-              <ProtectedRoute>
-                {(user) => (
-                  <WithLyfe user={user}>
-                    <HealthRoute />
-                  </WithLyfe>
-                )}
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/health"
-            element={
-              <ProtectedRoute>
-                {(user) => (
-                  <WithLyfe user={user}>
-                    <HealthIndexRedirect />
-                  </WithLyfe>
-                )}
-              </ProtectedRoute>
-            }
-          />
+            {/* Standalone Goals route */}
+            <Route path="/goals" element={<Goals />} />
 
-          {/* Other protected pages */}
-          <Route
-            path="/calendar"
-            element={
-              <ProtectedRoute>
-                {(user) => (
-                  <WithLyfe user={user}>
-                    <Calendar />
-                  </WithLyfe>
-                )}
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/personal"
-            element={
-              <ProtectedRoute>
-                {(user) => (
-                  <WithLyfe user={user}>
-                    <Personal />
-                  </WithLyfe>
-                )}
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/whiteboard"
-            element={
-              <ProtectedRoute>
-                {(user) => (
-                  <WithLyfe user={user}>
-                    <Whiteboard />
-                  </WithLyfe>
-                )}
-              </ProtectedRoute>
-            }
-          />
+            <Route path="/whiteboard" element={<Whiteboard />} />
 
-          {/* Social shortcut goes straight to Map */}
-          <Route
-            path="/social"
-            element={
-              <ProtectedRoute>
-                {(user) => (
-                  <WithLyfe user={user}>
-                    <Map />
-                  </WithLyfe>
-                )}
-              </ProtectedRoute>
-            }
-          />
+            {/* Finance */}
+            <Route path="/finance/:lyfeId" element={<FinanceRoute />} />
+            <Route path="/finance" element={<FinanceIndexRedirect />} />
 
-          {/* Social sub-pages */}
-          <Route
-            path="/social/map"
-            element={
-              <ProtectedRoute>
-                {(user) => (
-                  <WithLyfe user={user}>
-                    <Map />
-                  </WithLyfe>
-                )}
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/social/split"
-            element={
-              <ProtectedRoute>
-                {(user) => (
-                  <WithLyfe user={user}>
-                    <Split />
-                  </WithLyfe>
-                )}
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/social/list"
-            element={
-              <ProtectedRoute>
-                {(user) => (
-                  <WithLyfe user={user}>
-                    <List />
-                  </WithLyfe>
-                )}
-              </ProtectedRoute>
-            }
-          />
+            {/* Health */}
+            <Route path="/health/:lyfeId" element={<HealthRoute />} />
+            <Route path="/health" element={<HealthIndexRedirect />} />
 
-          {/* Tutorial */}
-          <Route
-            path="/tutorial"
-            element={
-              <ProtectedRoute>
-                {(user) => (
-                  <WithLyfe user={user}>
-                    <Tutorial />
-                  </WithLyfe>
-                )}
-              </ProtectedRoute>
-            }
-          />
+            {/* Social */}
+            <Route path="/social" element={<Map />} />
+            <Route path="/social/map" element={<Map />} />
+            <Route path="/social/split" element={<Split />} />
+            <Route path="/social/list" element={<List />} />
 
-          {/* Catch-all redirect */}
+            {/* Tutorial */}
+            <Route path="/tutorial" element={<Tutorial />} />
+          </Route>
+
+          {/* Catch-all */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>

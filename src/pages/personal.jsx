@@ -3,9 +3,11 @@ import React, { useEffect, useState } from "react";
 import Healthbg from "../assets/Health.svg";   // background image
 import Rachel from "../assets/Rachel.png";     // button image
 import Redirect_Button from "../components/Redirect_Button";
+import Health_Button from "../assets/Health_Button.png";
+import Goals_Button from "../assets/Goals_Button.png";
 
 // native background size (the size your SVG was designed for)
-const BASE_W = 1440;
+const BASE_W = 1920;
 const BASE_H = 1080;
 
 export default function Personal() {
@@ -51,12 +53,22 @@ export default function Personal() {
       >
         {/* Button placed in design pixels relative to original background */}
         <Redirect_Button
-          img={Rachel}
-          top="666px"    // <== Y in design pixels (74% of 900 ≈ 666)
-          left="1000px"   // <== X in design pixels (54.95% of 1440 ≈ 791)
+          img={Health_Button}
+          top="720px"    // <== Y in design pixels (74% of 900 ≈ 666)
+          left="960px"   // <== X in design pixels (54.95% of 1440 ≈ 791)
           rotation={0}
-          route="/lyfe"
-          scale={63}
+          route="/health"
+          scale={100}
+          hoverScale={1.1}
+          isDesignCoords   // optional flag so we know these are design pixels
+        />
+                <Redirect_Button
+          img={Goals_Button}
+          top="360px"    // <== Y in design pixels (74% of 900 ≈ 666)
+          left="960px"   // <== X in design pixels (54.95% of 1440 ≈ 791)
+          rotation={0}
+          route="/personal/goals"
+          scale={100}
           hoverScale={1.1}
           isDesignCoords   // optional flag so we know these are design pixels
         />

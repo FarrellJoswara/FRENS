@@ -1,0 +1,154 @@
+/* Root background + glass card (mirrors Lyfe/Finance look) */
+.goals-root {
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.goals-overlay {
+  position: absolute; inset: 0;
+  background: radial-gradient(70% 80% at 50% 20%, rgba(255,255,255,0.55), rgba(255,255,255,0.15));
+  pointer-events: none;
+}
+.goals-card {
+  position: relative;
+  width: min(900px, 88vw);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(255,255,255,0.78));
+  border: 1px solid rgba(2,6,23,0.08);
+  border-radius: 22px;
+  box-shadow: 0 20px 60px rgba(2,6,23,0.15);
+  padding: 18px 20px 24px;
+  backdrop-filter: blur(6px);
+}
+
+/* Header */
+.goals-head {
+  display: flex; align-items: end; justify-content: space-between;
+  margin-bottom: 10px;
+}
+.goals-head h1 { margin: 0; font-size: 28px; letter-spacing: -0.02em; }
+.goals-head p { margin: 2px 0 0; color: #475569; }
+.right-chip {
+  display: grid; gap: 2px; padding: 6px 10px; border-radius: 12px; border: 1px solid #e2e8f0; background: #ffffffd9;
+  text-align: right;
+}
+.right-chip .k { font-size: 12px; color: #64748b; }
+.right-chip .v { font-weight: 800; }
+
+/* Panels & fields (shared style with Lyfe/Finance) */
+.panel { margin-top: 16px; padding: 16px; border-radius: 16px; border: 1px solid #e2e8f0; background: #ffffffc9; }
+.panel.soft { background: #fff; }
+.panel-title { margin: 0 0 10px; font-weight: 800; }
+
+.field { display: block; }
+.field-row { display: flex; align-items: center; justify-content: space-between; }
+.field-label { font-size: 13px; color: #334155; margin-bottom: 6px; }
+.field-right { font-size: 12px; color: #64748b; }
+.input {
+  width: 100%; padding: 10px 12px; border-radius: 10px;
+  border: 1px solid #cbd5e1; font-size: 14px; background: #ffffffea;
+}
+.input:focus { outline: none; border-color: #38bdf8; box-shadow: 0 0 0 3px rgba(56,189,248,.2); }
+
+.hint { margin-top: 6px; font-size: 12px; color: #64748b; }
+.empty { color: #64748b; }
+
+/* Grids */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.grid4 { display: grid; grid-template-columns: 1.4fr 0.9fr 1fr 1fr; gap: 12px; }
+@media (max-width: 920px) {
+  .grid4 { grid-template-columns: 1fr; }
+  .grid3 { grid-template-columns: 1fr; }
+  .grid2 { grid-template-columns: 1fr; }
+}
+
+/* Buttons */
+.actions { margin-top: 14px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.primary {
+  background: linear-gradient(180deg, #22c55e, #16a34a);
+  color: white; border: none; border-radius: 12px; padding: 10px 14px; font-weight: 800; cursor: pointer;
+}
+.primary:disabled { opacity: .6; cursor: not-allowed; }
+.secondary {
+  background: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1; border-radius: 12px; padding: 10px 14px; font-weight: 700; cursor: pointer;
+}
+.secondary:hover { background: #e2e8f0; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip {
+  background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 999px; padding: 6px 10px; font-weight: 700; cursor: pointer; font-size: 13px;
+}
+.chip:hover { background: #eef2f7; }
+.chip.danger { border-color: #fecaca; color: #b91c1c; background: #fff1f2; }
+.chip.on { background: #e9ffef; border-color: #86efac; }
+
+/* Legend / charts */
+.legend { margin-top: 8px; display: grid; gap: 4px; }
+.legend-row { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.legend-row b { margin-left: auto; }
+.swatch { width: 12px; height: 12px; border-radius: 3px; background: #e2e8f0; }
+.mini-title { font-weight: 800; margin-bottom: 8px; }
+
+/* Goal list */
+.filters { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center; margin-bottom: 10px; }
+@media (max-width: 920px) {
+  .filters { grid-template-columns: 1fr; }
+}
+.goal-list { display: grid; gap: 12px; }
+.goal-item {
+  border: 1px solid #e2e8f0; border-radius: 14px; background: #fff; padding: 12px;
+  display: grid; gap: 10px;
+}
+.goal-item.done { border-color: #bbf7d0; box-shadow: inset 0 0 0 2px #dcfce7; }
+
+.goal-main { display: grid; gap: 4px; }
+.goal-title { font-weight: 800; font-size: 16px; }
+.goal-meta { color: #475569; font-size: 13px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.sep { color: #cbd5e1; }
+.pill { padding: 2px 8px; border-radius: 999px; font-weight: 700; font-size: 12px; border: 1px solid #e2e8f0; background: #f8fafc; }
+.pill.cat.finance { background: #f0f9ff; border-color: #bae6fd; color: #075985; }
+.pill.cat.health { background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
+.pill.cat.personal { background: #eef2ff; border-color: #c7d2fe; color: #3730a3; }
+.pill.cat.social { background: #fff7ed; border-color: #fed7aa; color: #9a3412; }
+.pill.cat.education { background: #fdf2f8; border-color: #fbcfe8; color: #9d174d; }
+.pill.cat.other { background: #f1f5f9; border-color: #cbd5e1; color: #0f172a; }
+
+.goal-actions { display: grid; gap: 8px; }
+.progress { display: flex; align-items: center; gap: 8px; }
+.progress input[type="range"] { width: 220px; }
+.pct { font-weight: 800; min-width: 42px; text-align: right; }
+
+.row-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.checklist { border-top: 1px dashed #e2e8f0; padding-top: 10px; display: grid; gap: 8px; }
+.check-hd { font-weight: 800; }
+.check-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.check { display: flex; align-items: center; gap: 8px; }
+.str { text-decoration: line-through; color: #94a3b8; }
+.addstep { display: flex; gap: 8px; }
+
+/* Capsules */
+.capsule-list { display: grid; gap: 12px; }
+.capsule { border: 1px solid #e2e8f0; border-radius: 14px; background: #fff; padding: 12px; display: grid; gap: 8px; }
+.cap-hd { display: flex; align-items: center; justify-content: space-between; }
+.cap-title { font-weight: 800; }
+.cap-body { white-space: pre-wrap; }
+.cap-body.blur { filter: blur(4px); user-select: none; }
+.pill.open { background: #ecfeff; border-color: #a5f3fc; color: #0e7490; }
+
+.ns { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* simple chart classes */
+.donut { display: block; }
+.bars text.bar-label { fill: #334155; font-size: 12px; }
+.bars text.bar-value { fill: #334155; font-size: 12px; }
+.bar-fill-anim { transition: width .35s ease; }
+.donut-anim { transition: stroke-dashoffset .45s ease; }
