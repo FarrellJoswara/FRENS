@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import "./Finance.css";
 import FinanceBg from "../assets/Finance.svg";
 
+
 /** ---------- helpers ---------- */
 const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
 const currency = (n) =>
