@@ -15,12 +15,13 @@ import Whiteboard from "./pages/whiteboard";
 import Map from "./pages/social/map";
 import Split from "./pages/social/split";
 import List from "./pages/social/list";
+import Tutorial from "./pages/tutorial";
 
-import { LyfeProvider, useLyfe } from "./lyfe/LyfeContext"; // ⬅️ added useLyfe
+import { LyfeProvider, useLyfe } from "./lyfe/LyfeContext";
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
-/* ---------- Auth gate that injects {user} ---------- */
+/* ---------- ProtectedRoute ---------- */
 function ProtectedRoute({ children }) {
   const token = sessionStorage.getItem("google_token");
   if (!token) return <Navigate to="/" replace />;
@@ -32,15 +33,16 @@ function ProtectedRoute({ children }) {
   } catch (e) {
     console.error("Failed to decode token:", e);
   }
-  return React.cloneElement(children, { user });
+
+  return typeof children === "function" ? children(user) : React.cloneElement(children, { user });
 }
 
-/* ---------- Wrap any subtree with LyfeProvider using the user from ProtectedRoute ---------- */
+/* ---------- WithLyfe ---------- */
 function WithLyfe({ children, user }) {
   return <LyfeProvider userEmail={user?.email}>{children}</LyfeProvider>;
 }
 
-/* ---------- Route helpers to pass :lyfeId down as a prop if your pages expect it ---------- */
+/* ---------- Route wrappers for :lyfeId ---------- */
 function FinanceRoute() {
   const { lyfeId } = useParams();
   return <Finance lyfeId={lyfeId} />;
@@ -50,7 +52,7 @@ function HealthRoute() {
   return <Health lyfeId={lyfeId} />;
 }
 
-/* ---------- Index redirects that jump to the active lyfe if present ---------- */
+/* ---------- Index redirects using Lyfe context ---------- */
 function FinanceIndexRedirect() {
   const { currentId } = useLyfe();
   return currentId ? <Navigate to={`/finance/${currentId}`} replace /> : <Navigate to="/lyfe" replace />;
@@ -60,7 +62,7 @@ function HealthIndexRedirect() {
   return currentId ? <Navigate to={`/health/${currentId}`} replace /> : <Navigate to="/lyfe" replace />;
 }
 
-function App() {
+export default function App() {
   if (!clientId) {
     console.warn("VITE_GOOGLE_CLIENT_ID is missing. Set it in your .env file.");
   }
@@ -69,61 +71,71 @@ function App() {
     <GoogleOAuthProvider clientId={clientId || "missing-client-id"}>
       <Router>
         <Routes>
+          {/* Public routes */}
           <Route path="/" element={<LoginPage />} />
 
+          {/* Protected routes */}
           <Route
             path="/front"
             element={
               <ProtectedRoute>
-                <WithLyfe>
-                  <FrontPage />
-                </WithLyfe>
+                {(user) => (
+                  <WithLyfe user={user}>
+                    <FrontPage />
+                  </WithLyfe>
+                )}
               </ProtectedRoute>
             }
           />
-
-          {/* Lyfe selector hub */}
           <Route
             path="/lyfe"
             element={
               <ProtectedRoute>
-                <WithLyfe>
-                  <Lyfe />
-                </WithLyfe>
+                {(user) => (
+                  <WithLyfe user={user}>
+                    <Lyfe />
+                  </WithLyfe>
+                )}
               </ProtectedRoute>
             }
           />
 
-          {/* Finance & Health tied to a specific lyfe */}
+          {/* Finance */}
           <Route
             path="/finance/:lyfeId"
             element={
               <ProtectedRoute>
-                <WithLyfe>
-                  <FinanceRoute />
-                </WithLyfe>
+                {(user) => (
+                  <WithLyfe user={user}>
+                    <FinanceRoute />
+                  </WithLyfe>
+                )}
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/health/:lyfeId"
-            element={
-              <ProtectedRoute>
-                <WithLyfe>
-                  <HealthRoute />
-                </WithLyfe>
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Base paths → auto-jump to current lyfe (or /lyfe if none) */}
           <Route
             path="/finance"
             element={
               <ProtectedRoute>
-                <WithLyfe>
-                  <FinanceIndexRedirect />
-                </WithLyfe>
+                {(user) => (
+                  <WithLyfe user={user}>
+                    <FinanceIndexRedirect />
+                  </WithLyfe>
+                )}
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Health */}
+          <Route
+            path="/health/:lyfeId"
+            element={
+              <ProtectedRoute>
+                {(user) => (
+                  <WithLyfe user={user}>
+                    <HealthRoute />
+                  </WithLyfe>
+                )}
               </ProtectedRoute>
             }
           />
@@ -131,21 +143,25 @@ function App() {
             path="/health"
             element={
               <ProtectedRoute>
-                <WithLyfe>
-                  <HealthIndexRedirect />
-                </WithLyfe>
+                {(user) => (
+                  <WithLyfe user={user}>
+                    <HealthIndexRedirect />
+                  </WithLyfe>
+                )}
               </ProtectedRoute>
             }
           />
 
-          {/* other pages (kept inside WithLyfe so the active-lyfe badge can work) */}
+          {/* Other protected pages */}
           <Route
             path="/calendar"
             element={
               <ProtectedRoute>
-                <WithLyfe>
-                  <Calendar />
-                </WithLyfe>
+                {(user) => (
+                  <WithLyfe user={user}>
+                    <Calendar />
+                  </WithLyfe>
+                )}
               </ProtectedRoute>
             }
           />
@@ -153,9 +169,11 @@ function App() {
             path="/personal"
             element={
               <ProtectedRoute>
-                <WithLyfe>
-                  <Personal />
-                </WithLyfe>
+                {(user) => (
+                  <WithLyfe user={user}>
+                    <Personal />
+                  </WithLyfe>
+                )}
               </ProtectedRoute>
             }
           />
@@ -163,29 +181,39 @@ function App() {
             path="/whiteboard"
             element={
               <ProtectedRoute>
-                <WithLyfe>
-                  <Whiteboard />
-                </WithLyfe>
+                {(user) => (
+                  <WithLyfe user={user}>
+                    <Whiteboard />
+                  </WithLyfe>
+                )}
               </ProtectedRoute>
             }
           />
+
+          {/* Social shortcut goes straight to Map */}
           <Route
             path="/social"
             element={
               <ProtectedRoute>
-                <WithLyfe>
-                  <Social />
-                </WithLyfe>
+                {(user) => (
+                  <WithLyfe user={user}>
+                    <Map />
+                  </WithLyfe>
+                )}
               </ProtectedRoute>
             }
           />
+
+          {/* Social sub-pages */}
           <Route
             path="/social/map"
             element={
               <ProtectedRoute>
-                <WithLyfe>
-                  <Map />
-                </WithLyfe>
+                {(user) => (
+                  <WithLyfe user={user}>
+                    <Map />
+                  </WithLyfe>
+                )}
               </ProtectedRoute>
             }
           />
@@ -193,9 +221,11 @@ function App() {
             path="/social/split"
             element={
               <ProtectedRoute>
-                <WithLyfe>
-                  <Split />
-                </WithLyfe>
+                {(user) => (
+                  <WithLyfe user={user}>
+                    <Split />
+                  </WithLyfe>
+                )}
               </ProtectedRoute>
             }
           />
@@ -203,16 +233,33 @@ function App() {
             path="/social/list"
             element={
               <ProtectedRoute>
-                <WithLyfe>
-                  <List />
-                </WithLyfe>
+                {(user) => (
+                  <WithLyfe user={user}>
+                    <List />
+                  </WithLyfe>
+                )}
               </ProtectedRoute>
             }
           />
+
+          {/* Tutorial */}
+          <Route
+            path="/tutorial"
+            element={
+              <ProtectedRoute>
+                {(user) => (
+                  <WithLyfe user={user}>
+                    <Tutorial />
+                  </WithLyfe>
+                )}
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Catch-all redirect */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
     </GoogleOAuthProvider>
   );
 }
-
-export default App;

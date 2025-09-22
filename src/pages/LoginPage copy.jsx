@@ -8,15 +8,15 @@ import LoginBg from "../assets/LoginPage.svg";
 const BASE_W = 1920;
 const BASE_H = 1080;
 
-// Design positions (visuals from first version)
+// Design positions (in original pixels)
 const CARD = { left: 561, top: 345, width: 600 };
 const INPUT_HEIGHT = 50;
 const INPUT_GAP = 30;
 const CARD_PADDING = 20;
 
 // Google button design
-const GOOGLE = { left: 270, top: 640, width: 1000 };
-const GOOGLE_SCALE = 1.2;
+const GOOGLE = { left: 270, top: 640, width: 1000 }; // width is base width
+const GOOGLE_SCALE = 1.2; // scale factor for height/overall size
 
 // Divider design
 const DIVIDER = { left: CARD.left, top: CARD.top + 2 * INPUT_HEIGHT + 3 * INPUT_GAP + 10, width: CARD.width };
@@ -45,22 +45,11 @@ export default function LoginPage() {
     return () => window.removeEventListener("resize", compute);
   }, []);
 
-  // Proper Google login (second version)
-  const handleGoogleSuccess = (credentialResponse) => {
-    if (credentialResponse?.credential) {
-      sessionStorage.setItem("google_token", credentialResponse.credential);
-      navigate("/tutorial", { replace: true });
-    } else {
-      console.warn("Google login succeeded but no credential present", credentialResponse);
-    }
-  };
-  const handleGoogleError = () => alert("Google login failed. Please try again.");
-
-  // Proper local login (second version)
+  // Local auth demo
   const handleLocalLogin = (e) => {
     e.preventDefault();
-    const u = String(username).trim();
-    const p = String(password).trim();
+    const u = username.trim();
+    const p = password.trim();
     if (!u || !p) return alert("Enter username and password.");
 
     const USERS_KEY = "demo_users_v1";
@@ -80,6 +69,15 @@ export default function LoginPage() {
     navigate("/front", { replace: true });
   };
 
+  // Google auth
+  const handleGoogleSuccess = (res) => {
+    if (res?.credential) {
+      sessionStorage.setItem("google_token", res.credential);
+      navigate("/front", { replace: true });
+    }
+  };
+  const handleGoogleError = () => alert("Google login failed. Please try again.");
+
   return (
     <div
       style={{
@@ -91,7 +89,7 @@ export default function LoginPage() {
         overflow: "hidden",
       }}
     >
-      {/* Stage overlay */}
+      {/* Stage overlay that scales with background */}
       <div
         style={{
           position: "fixed",
@@ -158,7 +156,7 @@ export default function LoginPage() {
           style={{
             position: "absolute",
             left: CARD.left,
-            top: GOOGLE.top - 30,
+            top: GOOGLE.top-30, // adjust to place below the form
             width: CARD.width,
             display: "flex",
             alignItems: "center",
@@ -171,7 +169,7 @@ export default function LoginPage() {
           <div style={{ flex: 1, height: 1, background: "rgba(0,0,0,0.08)" }} />
         </div>
 
-        {/* Google button */}
+        {/* Google login button with absolute positioning + scale */}
         <div
           style={{
             position: "absolute",

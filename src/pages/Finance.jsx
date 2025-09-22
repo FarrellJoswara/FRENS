@@ -1,20 +1,6 @@
+import React, { useMemo, useState } from "react";
 import "./Finance.css";
 import FinanceBg from "../assets/Finance.svg";
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
-import { useLyfe, useLyfeSlice } from "../lyfe/LyfeContext";
-
-function bandToMonthlyRangeStr(label) {
-  const nums = (label.match(/\d+/g) || []).map((n) => parseInt(n, 10));
-  let loA = 20, hiA = 30;
-  if (nums.length >= 2) { loA = nums[0]; hiA = nums[1]; }
-  else if (nums.length === 1) { loA = nums[0]; hiA = nums[0] + 20; }
-  const loNet = (loA * 1000) * 0.72;
-  const hiNet = (hiA * 1000) * 0.72;
-  const loM = Math.round(loNet / 12 / 100) * 100;
-  const hiM = Math.round(hiNet / 12 / 100) * 100;
-  return `${Math.max(800, loM)}-${Math.min(10000, hiM)}`;
-}
 
 /** ---------- helpers ---------- */
 const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
@@ -34,29 +20,13 @@ const BASE_COSTS = {
 };
 
 export default function Finance() {
-  /** ---------- load per-lyfe slice ---------- */
-  const { lyfeId } = useParams();
-  const { getById } = useLyfe();
-  const lyfe = getById(lyfeId);
-  const initFromMetaOnce = useRef(false);
-  const { slice, setSlice } = useLyfeSlice("finance", lyfeId);
-  const saved = slice?.inputs || {};
-
   /** 1) GOAL */
-  const [goal, setGoal] = useState(saved.goal ?? "Travel");
+  const [goal, setGoal] = useState("Travel");
 
   /** 2) SITUATION */
-  const [incomeRange, setIncomeRange] = useState(saved.incomeRange ?? "3000-4000");
-  useEffect(() => {
-    if (initFromMetaOnce.current) return;
-    const band = lyfe?.meta?.salaryBand;
-    if (band) {
-      setIncomeRange(bandToMonthlyRangeStr(band));
-      initFromMetaOnce.current = true;
-    }
-  }, [lyfe?.meta?.salaryBand]);
-  const [living, setLiving]         = useState(saved.living ?? "roommates"); // campus | roommates | solo
-  const [cityCost, setCityCost]     = useState(saved.cityCost ?? "avg");     // low | avg | high
+  const [incomeRange, setIncomeRange] = useState("3000-4000");
+  const [living, setLiving] = useState("roommates"); // campus | roommates | solo
+  const [cityCost, setCityCost] = useState("avg");   // low | avg | high
   const monthlyIncome = useMemo(() => incomeMid(incomeRange), [incomeRange]);
 
   // derived defaults for essentials
@@ -64,10 +34,10 @@ export default function Finance() {
 
   /** 3) MONTHLY PLAN (with optional adjust) */
   const [showAdjust, setShowAdjust] = useState(false);
-  const [rent, setRent]             = useState(saved.rent ?? defaults.rent);
-  const [food, setFood]             = useState(saved.food ?? defaults.food);
-  const [transport, setTransport]   = useState(saved.transport ?? defaults.transport);
-  const [lifestyle, setLifestyle]   = useState(saved.lifestyle ?? 400); // fun/other
+  const [rent, setRent] = useState(defaults.rent);
+  const [food, setFood] = useState(defaults.food);
+  const [transport, setTransport] = useState(defaults.transport);
+  const [lifestyle, setLifestyle] = useState(400); // fun/other
   const essentials = rent + food + transport;
 
   // compute Future-Me = leftover
@@ -84,8 +54,8 @@ export default function Finance() {
   }, [essentials, lifestyle, future]);
 
   /** 4) INVESTING */
-  const [risk, setRisk]           = useState(saved.risk ?? 2); // 1 cautious, 2 balanced, 3 ambitious
-  const [template, setTemplate]   = useState(saved.template ?? "Lazy Index");
+  const [risk, setRisk] = useState(2); // 1 cautious, 2 balanced, 3 ambitious
+  const [template, setTemplate] = useState("Lazy Index");
   const portfolio = useMemo(() => {
     const base = {
       "Lazy Index":       { cash: 20, bonds: 10, stocks: 70, crypto: 0 },
@@ -141,7 +111,7 @@ export default function Finance() {
   }, [goal, outlook.base, essentials]);
 
   /** keep defaults in sync if user changes situation and never opened “Adjust amounts” */
-  useEffect(() => {
+  React.useEffect(() => {
     if (!showAdjust) {
       setRent(defaults.rent);
       setFood(defaults.food);
@@ -149,49 +119,6 @@ export default function Finance() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [living, cityCost]);
-
-  /** ---------- hydrate on lyfe change ---------- */
-  useEffect(() => {
-    // re-hydrate when the :lyfeId changes
-    const sv = (slice && slice.inputs) || {};
-    const liv = sv.living ?? "roommates";
-    const cost = sv.cityCost ?? "avg";
-    const base = BASE_COSTS[liv][cost];
-
-    setGoal(sv.goal ?? "Travel");
-    setIncomeRange(sv.incomeRange ?? "3000-4000");
-    setLiving(liv);
-    setCityCost(cost);
-
-    setRent(sv.rent ?? base.rent);
-    setFood(sv.food ?? base.food);
-    setTransport(sv.transport ?? base.transport);
-    setLifestyle(sv.lifestyle ?? 400);
-
-    setRisk(sv.risk ?? 2);
-    setTemplate(sv.template ?? "Lazy Index");
-    // showAdjust untouched (user preference)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lyfeId]);
-
-  /** ---------- persist to lyfe ---------- */
-  useEffect(() => {
-    setSlice({
-      inputs: {
-        goal, incomeRange, living, cityCost,
-        rent, food, transport, lifestyle,
-        risk, template,
-      },
-      computed: {
-        monthlyIncome, essentials, future,
-      },
-    });
-  }, [
-    goal, incomeRange, living, cityCost,
-    rent, food, transport, lifestyle,
-    risk, template,
-    monthlyIncome, essentials, future,
-  ]);
 
   /** ---------- UI ---------- */
   return (
@@ -505,5 +432,5 @@ function BarChart({ data, width=460, barH=14, gap=12 }) {
 /** ---------- tiny label helpers ---------- */
 const emojiFor = (k) => ({Travel:"✈️","Emergency Fund":"🛟","Down Payment":"🏡",Retirement:"👵"}[k] || "🎯");
 const labelLiving = (v)=>({campus:"on-campus", roommates:"roommates", solo:"solo"}[v]);
-const labelCity   = (v)=>({low:"low-cost", avg:"average-cost", high:"high-cost"}[v]);
-const labelIcon   = (k)=>({cash:"💵", bonds:"🏦", stocks:"📈", crypto:"🪙", venture:"🚀"}[k]||"•");
+const labelCity = (v)=>({low:"low-cost", avg:"average-cost", high:"high-cost"}[v]);
+const labelIcon = (k)=>({cash:"💵", bonds:"🏦", stocks:"📈", crypto:"🪙", venture:"🚀"}[k]||"•");
