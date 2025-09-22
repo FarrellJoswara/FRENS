@@ -1,0 +1,121 @@
+/* page background & scrolling */
+.whiteboard-root {
+  position: relative;
+  min-height: 100dvh;
+  overflow-y: auto;                 /* ensure this element scrolls */
+  background-image: url("../assets/Whiteboard.svg");
+  background-size: cover;
+  background-position: center;
+  /* background-attachment: fixed;  <-- remove/comment this */
+}
+
+
+/* soft overlay that stays while you scroll */
+.whiteboard-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(1200px 800px at 70% 8%, rgba(255,255,255,0.88), rgba(255,255,255,0.50));
+}
+
+/* centered content */
+.wb-container {
+  position: relative;
+  z-index: 1;
+  width: min(1200px, 96vw);
+  margin: 28px auto 48px;
+  padding: 0 4px;
+}
+
+/* grid */
+.wb-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 12px;
+}
+@media (max-width: 1024px) {
+  .wb-grid { grid-template-columns: 1fr; }
+}
+
+/* cards */
+.wb-panel {
+  background: rgba(255,255,255,0.92);
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 14px;
+  backdrop-filter: blur(6px);
+  overflow: hidden;
+}
+
+/* header & controls */
+.wb-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.wb-title { margin: 0; font-size: 26px; font-weight: 900; color: #0f172a; }
+.wb-sub { margin: 6px 0 0; color: #334155; }
+.wb-switch { display: flex; gap: 10px; align-items: center; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px 10px; }
+.wb-switch-k { font-size: 12px; color: #64748b; margin-right: 6px; }
+.wb-select { border: none; background: transparent; }
+
+/* meta pills */
+.wb-meta { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+.pill { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px 10px; display: flex; gap: 6px; align-items: center; }
+.pill-k { font-size: 12px; color: #64748b; }
+
+/* section headers */
+.panel-hd { margin-bottom: 6px; }
+.panel-title { font-size: 18px; font-weight: 900; color: #0f172a; }
+.panel-sub { font-size: 12px; color: #475569; }
+
+.row-wrap { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.row-label { font-size: 12px; color: #475569; font-weight: 700; }
+.row-label.push { margin-left: auto; }
+.row-chips { display: flex; gap: 8px; }
+.row-note { font-size: 12px; color: #64748b; }
+.note-suggest { color: #0ea5a5; margin-left: 6px; }
+
+/* chips */
+.chip { border: 1px solid #e2e8f0; background: #fff; border-radius: 999px; padding: 6px 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.chip.on { background: #0ea5a5; color: #fff; border-color: #0ea5a5; }
+.chip.big { padding: 10px 14px; border-radius: 12px; font-weight: 800; }
+
+/* stats & legend */
+.year-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 8px; }
+@media (max-width: 680px){ .year-grid { grid-template-columns: repeat(2, 1fr); } }
+.stat { border: 1px solid #e2e8f0; border-radius: 12px; background: #fff; padding: 10px 10px 8px; }
+.stat-k { font-size: 12px; color: #64748b; margin-bottom: 2px; }
+.stat-v { font-weight: 900; color: #0f172a; }
+.stat-hint { font-size: 12px; color: #64748b; }
+
+.pill-row { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+
+.split-grid { display: grid; grid-template-columns: auto 1fr; gap: 12px; }
+.donut-box { display: grid; place-items: center; }
+.split-legend { display: grid; gap: 8px; }
+.split-row { display: flex; align-items: center; gap: 8px; }
+.sw { width: 10px; height: 10px; border-radius: 2px; }
+
+.mt { margin-top: 12px; }
+
+.milestones { margin: 6px 0 0 18px; color: #334155; }
+
+/* small chart text */
+.bar-label { font-size: 12px; fill: #475569; }
+.bar-value { font-size: 12px; fill: #1f2937; }
+
+/* actions */
+.actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* make sure the app can scroll on smaller screens */
+html, body, #root { height: 100%; }
+
+html, body, #root {
+  height: auto;
+  min-height: 100%;
+}
+
+body {
+  overflow-y: auto !important;      /* force-enable scrolling if anything disabled it */
+}
+
+.wb-container {
+  padding-bottom: 64px;             /* a little breathing room to reach the bottom */
+}
