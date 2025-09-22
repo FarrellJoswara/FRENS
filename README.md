@@ -1,39 +1,25 @@
-# React + Vite
+# Lyfein5 App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Lyfein5 is a smart, integrated lifestyle app designed to help you live more intentionally. Unlike traditional apps that focus on just one area of life, Lyfein5 connects your activities, goals, and progress, showing how your choices in one area affect others. It’s a tool for making smarter decisions, staying balanced, and getting the most out of your time, energy, and resources.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Social
+- Discover events near you on an interactive map.
+- View details such as time, location, cost, and other key factors.
+- Create events that are public or private, controlling who can see them.
+- Track how attending events impacts your schedule, budget, and overall plan.
 
-## Expanding the ESLint configuration
+### Health
+- Input personal data to generate a customized workout plan.
+- Receive macro nutrient targets tailored to your goals.
+- Track your workouts and progress over time.
+- Understand how staying active affects your energy, productivity, and ability to participate in events.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Goals
+- Set and track any goal, from hobbies to skill development or personal milestones.
+- Monitor progress and stay motivated to achieve what matters most.
+- See how pursuing goals interacts with your schedule, finances, and lifestyle.
 
-
-## Google Sign-In (local setup)
-
-This project uses `@react-oauth/google` for a client-side Google Sign-In flow.
-
-1. Create OAuth 2.0 credentials in the Google Cloud Console: https://console.cloud.google.com/apis/credentials
-	- Create an OAuth Client ID (type: Web application)
-	- Add `http://localhost:5173` (or your dev URL) to the Authorized JavaScript origins.
-	- Copy the Client ID.
-
-2. Create a `.env` file at the project root (copy from `.env.example`) and set:
-
-```
-VITE_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
-```
-
-3. Start the dev server:
-
-```powershell
-npm install; npm run dev
-```
-
-Notes:
-- The app reads the client id from `import.meta.env.VITE_GOOGLE_CLIENT_ID` and wraps the app with `GoogleOAuthProvider`.
-- After signing in via the Login page, the app stores the Google credential JWT in `sessionStorage` under `google_token` and redirects to `/front`.
-- If the dev server warns about Node version, upgrade Node.js to >= 22.12.0.
+## Why Lyfein5 is Different
+Lyfein5 doesn’t treat parts of your life in isolation. Every decision — attending an event, starting a new habit, or pursuing a goal — is tracked and considered in the context of your overall life. The app helps you see the ripple effects of your choices, guiding you to make smarter decisions, maintain balance, and maximize your personal growth.
