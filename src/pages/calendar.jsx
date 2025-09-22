@@ -11,15 +11,15 @@ import CalBg from "../assets/calbg.svg";
 export default function Calendar() {
   const [events, setEvents] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [filter, setFilter] = useState("month"); // for upcoming events toggle
+  const [showProjection, setShowProjection] = useState(false); // NEW popup state
+  const [filter, setFilter] = useState("month");
   const [newEvent, setNewEvent] = useState({
     title: "",
     start: "",
     end: "",
-    color: "#15223dff", // default blue
+    color: "#15223dff",
   });
 
-  /** Handle selecting a date range */
   const handleDateSelect = (selectInfo) => {
     setNewEvent({
       title: "",
@@ -30,7 +30,6 @@ export default function Calendar() {
     setShowModal(true);
   };
 
-  /** Add event */
   const addEvent = () => {
     if (!newEvent.title.trim()) return;
     setEvents([...events, { ...newEvent, id: Date.now().toString() }]);
@@ -38,21 +37,17 @@ export default function Calendar() {
     setShowModal(false);
   };
 
-  /** Delete event */
   const deleteEvent = (clickInfo) => {
     setEvents(events.filter((e) => e.id !== clickInfo.event.id));
   };
 
-  /** Filter upcoming events */
   const getFilteredEvents = () => {
     const now = new Date();
     const msInDay = 86400000;
     return events.filter((e) => {
       const eventDate = new Date(e.start);
       if (filter === "day") {
-        return (
-          eventDate.toDateString() === now.toDateString()
-        );
+        return eventDate.toDateString() === now.toDateString();
       }
       if (filter === "week") {
         const weekFromNow = new Date(now.getTime() + 7 * msInDay);
@@ -75,6 +70,10 @@ export default function Calendar() {
           <div>
             <h1 className="card-title">Rachel's Calendar</h1>
           </div>
+          {/* NEW BUTTON */}
+          <button className="btn primary" onClick={() => setShowProjection(true)}>
+            Project me in 5 years
+          </button>
         </header>
 
         <div className="body-grid">
@@ -139,6 +138,37 @@ export default function Calendar() {
                 </div>
               </div>
             )}
+
+            {/* PROJECTION MODAL */}
+            {showProjection && (
+              <div className="modal-backdrop">
+                <div className="modal-card">
+                  <h2 className="panel-title">Life in 5 Years</h2>
+
+                  <div className="projection-stats">
+                    <p><strong>Job:</strong> Product Manager at Ripple</p>
+                    <p><strong>Location:</strong> 111 W 19th St, New York, NY 10011</p>
+                    <p><strong>Salary:</strong> $165K</p>
+                    <p><strong>Savings:</strong> ~ $280K</p>
+                  </div>
+
+                  {/* Health Bar */}
+                  <div className="health-bar">
+                    <p><strong>Health:</strong> </p>
+                    <span role="img" aria-label="sad">😢</span>
+                    <div className="bar">
+                      <div className="arrow" />
+                    </div>
+                    <span role="img" aria-label="happy">😀</span>
+                  </div>
+                  <p className="hint">Health: Above average, trending towards happy!</p>
+
+                  <div className="modal-actions">
+                    <button className="btn secondary" onClick={() => setShowProjection(false)}>Close</button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* SIDEBAR: UPCOMING EVENTS */}
@@ -168,19 +198,19 @@ export default function Calendar() {
                 </div>
               </div>
               {getFilteredEvents().length === 0 ? (
-  <p className="hint">No events for this {filter}.</p>
-) : (
-  getFilteredEvents().map((e) => (
-    <div
-      key={e.id}
-      className="row upcoming-event"
-      style={{ borderLeft: `6px solid ${e.color}` }}
-    >
-      <span>{e.title}</span>
-      <strong>{new Date(e.start).toLocaleString()}</strong>
-    </div>
-  ))
-)}
+                <p className="hint">No events for this {filter}.</p>
+              ) : (
+                getFilteredEvents().map((e) => (
+                  <div
+                    key={e.id}
+                    className="row upcoming-event"
+                    style={{ borderLeft: `6px solid ${e.color}` }}
+                  >
+                    <span>{e.title}</span>
+                    <strong>{new Date(e.start).toLocaleString()}</strong>
+                  </div>
+                ))
+              )}
             </div>
           </aside>
         </div>

@@ -145,3 +145,36 @@ body{ margin:0; font-family:Inter,system-ui,sans-serif; color:var(--text); }
   color: #191037; /* soft purple */
   letter-spacing: 0.3px;
 }
+
+.projection-stats {
+  margin: 1rem 0;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.health-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.health-bar .bar {
+  position: relative;
+  flex-grow: 1;
+  height: 12px;
+  background: linear-gradient(to right, red, yellow, green);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.health-bar .arrow {
+  position: absolute;
+  top: -6px;
+  left: 70%; /* adjust % to move arrow closer/further */
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 15px solid black;
+}
