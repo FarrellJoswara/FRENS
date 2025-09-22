@@ -34,9 +34,14 @@ function Redirect_Button({
         left,
         transform: `translate(-50%, -50%) rotate(${rotation}deg) scale(${finalScale})`,
         cursor: "pointer",
-        transition: "transform 0.2s ease-in-out",
+        transition: "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
         width: "auto",
         height: "auto",
+        // glowing yellow border
+        boxShadow: hovered
+          ? "0 0 10px 5px yellow, 0 0 20px 10px yellow"
+          : "none",
+        borderRadius: "8px", // optional: round corners for glow
       }}
     />
   );
