@@ -1,3 +1,4 @@
+// middle man
 import React from "react";
 import Redirect_Button from "../../components/Redirect_Button"; // go up 2 levels into components
 import Button1 from "../../assets/react.svg"; // adjust path to your svg asset

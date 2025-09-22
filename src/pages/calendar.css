@@ -79,7 +79,7 @@ body{ margin:0; font-family:Inter,system-ui,sans-serif; color:var(--text); }
 }
 
 .modal-card{
-  background:#fff;
+  background:#ffffff;
   border-radius:18px;
   padding:20px;
   width:300px;

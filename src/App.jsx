@@ -10,7 +10,7 @@ import Lyfe from "./pages/lyfe";
 import Personal from "./pages/personal";
 import Social from "./pages/social/social";
 import Whiteboard from "./pages/whiteboard";
-import Map from "./pages/social/map";
+import Map from "./pages/social/map.jsx";
 import Split from "./pages/social/split";
 import List from "./pages/social/list";
 

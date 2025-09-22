@@ -15,8 +15,10 @@
     "@fullcalendar/list": "^6.1.19",
     "@fullcalendar/react": "^6.1.19",
     "@fullcalendar/timegrid": "^6.1.19",
+    "@googlemaps/markerclusterer": "^2.6.2",
     "@react-google-maps/api": "^2.20.7",
     "@react-oauth/google": "^0.12.2",
+    "@vis.gl/react-google-maps": "^1.5.5",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "react-router-dom": "^7.9.1"
