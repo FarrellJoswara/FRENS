@@ -16,6 +16,7 @@ import Map from "./pages/social/map";
 import Split from "./pages/social/split";
 import List from "./pages/social/list";
 import Tutorial from "./pages/tutorial";
+import Goals from "./pages/Goals";
 
 import { LyfeProvider, useLyfe } from "./lyfe/LyfeContext"; // ⬅️ added useLyfe
 
@@ -39,6 +40,12 @@ function ProtectedRoute({ children }) {
 /* ---------- Wrap any subtree with LyfeProvider using the user from ProtectedRoute ---------- */
 function WithLyfe({ children, user }) {
   return <LyfeProvider userEmail={user?.email}>{children}</LyfeProvider>;
+}
+
+// add near your other redirect helpers
+function GoalsIndexRedirect() {
+  const { currentId } = useLyfe();
+  return currentId ? <Navigate to={`/goals/${currentId}`} replace /> : <Navigate to="/lyfe" replace />;
 }
 
 /* ---------- Route helpers to pass :lyfeId down as a prop if your pages expect it ---------- */
@@ -220,6 +227,18 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route
+  path="/goals"
+  element={
+    <ProtectedRoute>
+      <WithLyfe>
+        <GoalsIndexRedirect />
+      </WithLyfe>
+    </ProtectedRoute>
+  }
+/>
+
         </Routes>
       </Router>
     </GoogleOAuthProvider>
