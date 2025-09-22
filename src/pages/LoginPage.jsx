@@ -73,11 +73,8 @@ export default function LoginPage() {
     }
     if (users[u].password !== p) return alert("Invalid username or password.");
 
-    localStorage.setItem(
-      SESSION_KEY,
-      JSON.stringify({ username: u, name: users[u].name, provider: "local" })
-    );
-    navigate("/front", { replace: true });
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ username: u, name: users[u].name, provider: "local" }));
+    navigate("/tutorial", { replace: true });
   };
 
   return (

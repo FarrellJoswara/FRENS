@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./Lyfe.css";
 import LyfeBg from "../assets/Lyfe.svg"; // <-- ensure this exists in /assets
+import LifeSelector from "../assets/life-selector.svg";
 
 import { useLyfe } from "../lyfe/LyfeContext";
 import { useNavigate } from "react-router-dom";
@@ -51,7 +52,7 @@ export default function Lyfe() {
   const onMakeActive = (id) => setCurrentId(id);
 
   return (
-    <div className="lyfe-root" style={{ backgroundImage: `url(${LyfeBg})` }}>
+    <div className="lyfe-root">
       <div className="lyfe-overlay" />
       <main className="lyfe-card">
         <header className="lyfe-head">

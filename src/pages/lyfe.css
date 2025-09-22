@@ -2,9 +2,14 @@
   min-height: 100vh;
   width: 100%;
   position: relative;
-  background-size: cover;
-  background-position: center;
+  background-image: url('../assets/life-path.png');
+  background-size: cover;       /* scale to cover container fully */
+  background-position: center;  /* center the image */
   background-repeat: no-repeat;
+  /* Center the content vertically and horizontally */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .lyfe-overlay {
   position: absolute; inset: 0;
@@ -14,8 +19,7 @@
 
 .lyfe-card {
   position: relative;
-  margin: 32px auto;
-  width: min(1100px, 92vw);
+  width: min(900px, 88vw);
   background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
   border: 1px solid rgba(2,6,23,0.08);
   border-radius: 22px;
