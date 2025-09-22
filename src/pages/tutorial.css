@@ -1,0 +1,150 @@
+:root { 
+  --overlay: rgba(0,0,0,.10); 
+  --panel: rgba(255,255,255,.86); 
+  --ring: rgba(0,0,0,.08);
+  --text: #0f172a; 
+  --muted: #475569;
+}
+
+.tutorial-root {
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  background-image: url('../assets/tutorial.svg');
+  background-size: cover;       /* scale to cover container fully */
+  background-position: center;  /* center the image */
+  background-repeat: no-repeat;
+}
+
+.tutorial-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--overlay);
+}
+
+.tutorial-card {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: min(900px, 90vw);
+  height: min(700px, 80vh);
+  background: var(--panel);
+  border: 1px solid var(--ring);
+  border-radius: 28px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 32px;
+}
+
+.tutorial-title {
+  text-align: center;
+  font-size: 38px;
+  font-weight: 800;
+  margin: 0 0 36px 0;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.tutorial-content {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 20px 0;
+  color: var(--text);
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+}
+
+.tutorial-content p {
+  line-height: 2.2;
+  margin-bottom: 40px;
+  font-size: 20px;
+  letter-spacing: 0.01em;
+  font-weight: 400;
+}
+
+.tutorial-navigation {
+  position: absolute;
+  bottom: 40px;
+  right: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.tutorial-nav-buttons {
+  display: flex;
+  gap: 16px;
+}
+
+.skip-button {
+  display: block;
+  margin: -30px auto 4px;
+  background: transparent;
+  color: #3b82f6;
+  border: none;
+  padding: 8px 16px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: underline;
+}
+
+.skip-button:hover {
+  color: #2563eb;
+}
+
+.back-button {
+  background: white;
+  color: #4a90c5;
+  border: 2px solid #77b7e4;
+  border-radius: 16px;
+  padding: 16px 48px;
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.back-button:hover {
+  background: #f8fafc;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(74, 144, 197, 0.15);
+}
+
+.next-button {
+  background: linear-gradient(180deg, #77b7e4, #4a90c5);
+  color: white;
+  border: none;
+  border-radius: 16px;
+  padding: 16px 48px;
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(74, 144, 197, 0.3);
+}
+
+.next-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(74, 144, 197, 0.4);
+}
+
+.rachel-container {
+  position: fixed;
+  left: 60px;
+  bottom: 0;
+  z-index: 10;
+  width: 350px;
+  pointer-events: none;
+}
+
+.rachel-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin-bottom: -20px;
+}

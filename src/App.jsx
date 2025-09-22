@@ -15,6 +15,7 @@ import Whiteboard from "./pages/whiteboard";
 import Map from "./pages/social/map";
 import Split from "./pages/social/split";
 import List from "./pages/social/list";
+import Tutorial from "./pages/tutorial";
 
 import { LyfeProvider, useLyfe } from "./lyfe/LyfeContext"; // ⬅️ added useLyfe
 
@@ -205,6 +206,16 @@ function App() {
               <ProtectedRoute>
                 <WithLyfe>
                   <List />
+                </WithLyfe>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/tutorial"
+            element={
+              <ProtectedRoute>
+                <WithLyfe>
+                  <Tutorial />
                 </WithLyfe>
               </ProtectedRoute>
             }

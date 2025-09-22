@@ -57,7 +57,7 @@ export default function LoginPage() {
   const handleSuccess = (credentialResponse) => {
     if (credentialResponse?.credential) {
       sessionStorage.setItem("google_token", credentialResponse.credential);
-      navigate("/front", { replace: true });
+      navigate("/tutorial", { replace: true });
     } else {
       console.warn("Google login succeeded but no credential present", credentialResponse);
     }
@@ -82,7 +82,7 @@ export default function LoginPage() {
     if (users[u].password !== p) return alert("Invalid username or password.");
 
     localStorage.setItem(SESSION_KEY, JSON.stringify({ username: u, name: users[u].name, provider: "local" }));
-    navigate("/front", { replace: true });
+    navigate("/tutorial", { replace: true });
   };
 
   return (
