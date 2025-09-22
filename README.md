@@ -1,4 +1,4 @@
-![LifeBalance App Demo](./assets/life-path.png)
+![LifeBalance App Demo](./src/assets/life-path.png)
 
 
 # Lyfein5 App
